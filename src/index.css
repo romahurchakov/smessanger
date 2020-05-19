@@ -1,0 +1,9 @@
+@import 'assets/styles/reset.scss';
+@import 'assets/styles/fonts.scss';
+@import 'assets/styles/variables.scss';
+@import 'assets/styles/global.scss';
+@import 'assets/styles/animations.scss';
+@import 'assets/styles/typography.scss';
+@import 'assets/styles/paddings.scss';
+@import 'assets/styles/ui.scss';
+@import 'assets/styles/atomics.scss';

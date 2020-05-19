@@ -1,0 +1,47 @@
+// margins (основное правило: внешние отсутпы отбивают вниз и вправо)
+.mr-8 {
+    margin-right: 8px;
+}
+.mr-16 {
+    margin-right: calc(var(--simple-padding)*2);
+}
+.mr-24 {
+    margin-right: calc(var(--simple-padding)*3);
+}
+.mr-32 {
+    margin-right: calc(var(--simple-padding)*4);
+}
+.mr-40 {
+    margin-right: calc(var(--simple-padding)*5);
+}
+.mr-48 {
+    margin-right: calc(var(--simple-padding)*6);
+}
+
+.mr-4 {
+    margin-right: 4px;
+}
+.mb-4 {
+    margin-bottom: 4px;
+}
+.mb-8 {
+    margin-bottom: var(--simple-padding);
+}
+.mb-12 {
+    margin-bottom: calc(var(--simple-padding)*1.5);
+}
+.mb-16 {
+    margin-bottom: calc(var(--simple-padding)*2);
+}
+.mb-24 {
+    margin-bottom: calc(var(--simple-padding)*3);
+}
+.mb-32 {
+    margin-bottom: calc(var(--simple-padding)*4);
+}
+.mb-40 {
+    margin-bottom: calc(var(--simple-padding)*5);
+}
+.mb-48 {
+    margin-bottom: calc(var(--simple-padding)*6);
+}

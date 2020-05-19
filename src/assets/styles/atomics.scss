@@ -1,0 +1,171 @@
+/* //TODO: SCSS ломанный. Нет возможности юзать миксины и расширения !!! */
+
+/* FLEX BOX */
+.fl {
+  display: flex;
+
+  /* DIRECTION */
+  &-dir-row {
+    display: flex;
+    flex-direction: row;
+  }
+  &-dir-row-rev {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  &-dir-col {
+    display: flex;
+    flex-direction: column;
+  }
+  &-dir-col-rev {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  /* WRAP */
+  &-wrap {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  &-wrap-no {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  &-wrap-rev {
+    display: flex;
+    flex-wrap: wrap-reverse;
+  }
+
+  /* JUSTIFY-CONTENT */
+  &-ju-start {
+    display: flex;
+    justify-content: flex-start;
+  }
+  &-ju-end {
+    display: flex;
+    justify-content: flex-end;
+  }
+  &-ju-center {
+    display: flex;
+    justify-content: center;
+  }
+  &-ju-between {
+    display: flex;
+    justify-content: space-between;
+  }
+  &-ju-around {
+    display: flex;
+    justify-content: space-around;
+  }
+  &-ju-evenly {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  /* ALIGN-ITEMS */
+  &-al-it-start {
+    display: flex;
+    align-items: flex-start;
+  }
+  &-al-it-end {
+    display: flex;
+    align-items: flex-end;
+  }
+  &-al-it-center {
+    display: flex;
+    align-items: center;
+  }
+  &-al-it-stretch {
+    display: flex;
+    align-items: stretch;
+  }
+  &-al-it-baseline {
+    display: flex;
+    align-items: baseline;
+  }
+
+  /* ALIGN-CONTENT */
+  &-al-start {
+    display: flex;
+    align-content: flex-start;
+  }
+  &-al-end {
+    display: flex;
+    align-content: flex-end;
+  }
+  &-al-center {
+    display: flex;
+    align-content: center;
+  }
+  &-al-stretch {
+    display: flex;
+    align-content: stretch;
+  }
+  &-al-between {
+    display: flex;
+    align-content: space-between;
+  }
+  &-al-around {
+    display: flex;
+    align-content: space-around;
+  }
+
+  /* GROW */
+  &-gr-1 {
+    display: flex;
+    flex-grow: 1;
+  }
+  &-gr-2 {
+    display: flex;
+    flex-grow: 2;
+  }
+  &-gr-3 {
+    display: flex;
+    flex-grow: 3;
+  }
+  &-gr-4 {
+    display: flex;
+    flex-grow: 4;
+  }
+  &-gr-5 {
+    display: flex;
+    flex-grow: 5;
+  }
+
+  /* SHRINK */
+  &-sh-1 {
+    display: flex;
+    flex-shrink: 1;
+  }
+  &-sh-2 {
+    display: flex;
+    flex-shrink: 2;
+  }
+  &-sh-3 {
+    display: flex;
+    flex-shrink: 3;
+  }
+  &-sh-4 {
+    display: flex;
+    flex-shrink: 4;
+  }
+  &-sh-5 {
+    display: flex;
+    flex-shrink: 5;
+  }
+
+}
+
+/* SHADOWS */
+.shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.08);
+
+  &-hover:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 12px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* TRANSITIONS */
+.trans {
+  transition: 0.3s ease-out;
+}

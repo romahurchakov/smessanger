@@ -1,0 +1,134 @@
+/* checkmark animation done (once) */
+.draw {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    animation: dash .5s linear forwards 1;
+}
+@keyframes dash {
+    from { stroke-dashoffset: 100; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* name="fade" mode="out-in" for Transition tag*/
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .3s ease;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+@keyframes rotating {
+    from {
+        transform: translate(-40px, -40px) rotate(0);
+    }
+    to {
+        transform: translate(-40px, -40px) rotate(360deg);
+    }
+}
+
+@keyframes small-rotating {
+    from {
+        transform: translate(-15px, -15px) rotate(0);
+    }
+    to {
+        transform: translate(-15px, -15px) rotate(360deg);
+    }
+}
+
+@keyframes percents-rotating {
+    from {
+        transform: translate(-50%, -50%) rotate(0);
+    }
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* name="height" mode="out-in" for Transition tag*/
+.height-enter-active, .height-leave-active {
+    overflow: auto;
+    max-height: 1000px;
+    transition: max-height .7s ease-out, overflow .7s ease-in;
+}
+.height-enter, .height-leave-to {
+    overflow: auto;
+    max-height: 0;
+    transition: max-height .5s ease-out, overflow .5s ease-out;
+}
+
+/* name="simple-height" mode="out-in" for Transition tag*/
+.simple-height-enter-active, .simple-height-leave-active {
+    overflow: auto;
+    max-height: 1600px;
+    transition: all .5s ease;
+}
+.simple-height-enter, .simple-height-leave-to {
+    overflow: auto;
+    max-height: 0;
+    transition: all .1s ease;
+}
+
+/* name="slow-height" mode="out-in" for Transition tag */
+.slow-height-enter-active, .slow-height-leave-active {
+    overflow: auto;
+    max-height: 500px;
+    transition: all 2s ease;
+}
+.slow-height-enter, .slow-height-leave-to {
+    overflow: auto;
+    max-height: 0;
+    transition: all .6s ease;
+}
+
+/* name="slide" mode="out-in" for Transition tag*/
+.slide-enter-active, .slide-leave-active {
+    overflow: auto;
+    max-height: 500px;
+    transition: all .4s ease;
+}
+.slide-enter, .slide-leave-to {
+    overflow: auto;
+    opacity: 0;
+    max-height: 0;
+    transition: all .3s ease;
+}
+
+@keyframes slide-enter {
+    from {
+        transform: translate(-50%, 25%);
+    }
+    to {
+        transform: translate(-50%, 0);
+    }
+}
+@keyframes slide-leave {
+    from {
+        transform: translate(-50%, 0);
+    }
+    to {
+        transform: translate(-50%, 25%);
+    }
+}
+
+/* name="fade-transform" mode="out-in" for Transition tag*/
+.fade-transform-enter-active, .fade-transform-leave-active {
+    animation: fade-tr-all-in .2s ease-in;
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s ease-in-out 0s, opacity .2s;
+}
+.fade-transform-enter, .fade-transform-leave-to {
+    animation: fade-tr-all-out .2s ease-out;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s ease-in-out .2s, opacity .2s;
+}
+
+@keyframes fade-tr-all-in {
+    from { transform: translate(-50%, 80%); }
+    to { transform: translate(-50%, 100%); }
+}
+@keyframes fade-tr-all-out {
+    from { transform: translate(-50%, 100%); }
+    to { transform: translate(-50%, 80%); }
+}

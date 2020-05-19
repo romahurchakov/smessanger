@@ -1,0 +1,118 @@
+//200,400,500,700 font-weight available
+.h1 {}
+/* Заголовок страницы */
+h1 {
+    font-size: 32px;
+    font-weight: 700;
+    @media (max-width: 767px) {
+        font-size: 32px;
+    }
+}
+
+/* Заголовок блока/темы/топика */
+h2 {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 700;
+    @media (max-width: 767px) {
+        font-size: 24px;
+    }
+}
+
+/* Заголовок вкладки */
+h3 {
+    font-size: 22px;
+    font-weight: 700;
+    @media (max-width: 767px) {
+        font-size: 17px;
+        font-weight: 500;
+    }
+}
+
+/* Заголовок внутри блока */
+h4 {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 700;
+}
+
+/* Заголовок колонки таблицы */
+h5 {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 700;
+}
+
+/* Стандартный текст */
+p {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+}
+
+b {
+    font-weight: 700;
+}
+
+/* Уменьшенный текст */
+.grey-text {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 200;
+    color: var(--grey1);
+}
+
+/* Подсвеченный текст */
+.apple-text {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 200;
+    color: var(--lightgreen);
+}
+
+/* Текст подсказок */
+.hint-text {
+    font-size: 12px;
+    font-weight: 200;
+    line-height: 16px;
+    color: var(--grey1);
+    &_light {
+        color: var(--white);
+    }
+}
+
+/* Текст ошибок */
+.err-txt {
+    font-size: 13px;
+    font-weight: 200;
+    color: var(--mts);
+}
+
+.blue-txt {
+    color: var(--lightblue);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+/* Текст заполнения полей / выпадающих списков */
+.input-text {
+    font-size: 15px;
+    font-weight: 200;
+    color: var(--black);
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.mid-bold {
+    font-weight: 500;
+}
+
+/* Текст placeholder'a */
+::placeholder {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    color: var(--grey);
+}
