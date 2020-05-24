@@ -24,6 +24,7 @@ body {
 
 .page {
     padding: 0 24px 40px 24px;
+    width: 70%;
     &__panel { /* Панель страницы для отображения названия страницы и хлебных крошек */
         padding: 16px 0 24px 0;
         background: var(--white);

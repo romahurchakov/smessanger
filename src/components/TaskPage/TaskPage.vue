@@ -1,0 +1,410 @@
+<template>
+  <main class="page-with-crumbs">
+    <div class="page-head mb-40">
+      <h1 class="title">{{ pageTitle }}</h1>
+      <div class="page-head-div">
+        <div
+          :style="{backgroundColor: colorData}"
+          class="task-completed"
+          v-if="readOnly"
+        >{{ status }}</div>
+        <div class="task-type">{{ taskType }}</div>
+      </div>
+    </div>
+    <section class="task mb-40">
+      <div class="task__info mb-24">
+        <div class="task__input" v-if="!readOnly">
+          <p class="hint-text mb-8">Введите название задания</p>
+          <el-input placeholder="Введите название" v-model="newTaskData.title" />
+        </div>
+        <div class="task__input" v-if="!readOnly">
+          <p class="hint-text mb-8">Поиск студента по ФИО</p>
+          <p v-if="readOnly">{{ taskData.fio }}</p>
+          <el-autocomplete
+            v-else
+            class="task__input autocomplete"
+            v-model="autocompleteValue"
+            :trigger-on-focus="false"
+            :fetch-suggestions="querySearch"
+            placeholder="Введите ФИО"
+            @select="handleSelect"
+          >
+            <i class="el-icon-search el-input__icon" slot="suffix" />
+            <template slot-scope="{ item }">
+              <div v-if="item.fio">{{ item.fio }}</div>
+              <div v-else>Поиск не дал результатов</div>
+            </template>
+          </el-autocomplete>
+        </div>
+      </div>
+      <div class="mb-24">
+        <p class="hint-text mb-8">Описание задания</p>
+        <p v-if="readOnly" class="text-style">{{ taskData.description || '-' }}</p>
+        <textarea v-else v-model="newTaskData.description" class="task__desc" />
+      </div>
+      <div class="task__info">
+        <TaskInput
+          :value="readOnly ? taskData.telnum : newTaskData.telnum"
+          hint="Номер телефона студента"
+        />
+        <TaskInput :value="readOnly ? taskData.mail : newTaskData.mail" hint="Почтовый адрес" />
+        <TaskInput :value="readOnly ? taskData.faculty : newTaskData.faculty" hint="Факультет" />
+        <TaskInput :value="readOnly ? taskData.group : newTaskData.group" hint="Группа" />
+        <div class="task__input">
+          <p class="hint-text mb-8">Дисциплина</p>
+          <p v-if="readOnly">{{ taskData.discipline }}</p>
+          <el-select v-else v-model="newTaskData.discipline" placeholder="Укажите вашу роль">
+            <el-option v-for='discipline in disciplines' :key='discipline.id' :label='discipline.name' :value="discipline.name"></el-option>
+
+          </el-select>
+        </div>
+        <div class="task__input">
+          <p class="hint-text mb-8">Дата создания</p>
+          <p v-if="readOnly">{{ taskData.issueDate }}</p>
+          <p v-else>{{ today }}</p>
+        </div>
+        <div class="task__input">
+          <p class="hint-text mb-8">Крайний срок сдачи</p>
+          <p v-if="readOnly">{{ taskData.thesisDate }}</p>
+          <el-date-picker
+            v-if="profile.role.teacher"
+            v-model="newTaskData.thesisDate"
+            popper-class="date"
+            :picker-options="datePickerOptions"
+            class="calendar"
+            value-format="yyyy.MM.dd"
+            format="d MMM yyyy г."
+            type="date"
+            placeholder="Выберите день"
+          />
+        </div>
+        <div class="task__input">
+          <div v-if="taskData.completed && profile.role.teacher">
+            <Button label="Скачать" type="info" @click="downloadReport">
+              <DownloadIcon width="24" height="24" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="actions">
+      <el-upload
+        v-if="profile.role.student"
+        class="upload-demo mr-24"
+        ref="upload"
+        :http-request="addAttachment"
+        :auto-upload="false"
+        with-credentials
+        multiple
+      >
+        <Button slot="trigger" type="info" label="Выбрать файл" width="170" />
+      </el-upload>
+      <Button
+        v-if="profile.role.student"
+        type="primary"
+        label="Отправить файл(ы)"
+        class="mr-24"
+        width="170"
+        @click="uploadFile"
+      />
+      <Button
+        v-if="profile.role.teacher && !readOnly "
+        type="primary"
+        label="Создать"
+        width="200"
+        @click="createTask"
+      ></Button>
+    </div>
+    <template></template>
+  </main>
+</template>
+
+<script>
+import TaskInput from "./TaskInput/TaskInput";
+import Button from "@/components/ui/Button/Button";
+import DownloadIcon from "@/assets/icons//download.svg";
+import { mapState, mapActions } from "vuex";
+export default {
+  components: {
+    TaskInput,
+    Button,
+    DownloadIcon
+  },
+  data() {
+    return {
+      file: "",
+      autocompleteValue: "",
+      datePickerOptions: {
+        disabledDate(date) {
+          return date < new Date().setDate(new Date().getDate() - 1);
+        }
+      },
+      newTaskData: {
+        users: [],
+        id: null,
+        name: "",
+        discipline: "Выберите дисциплину",
+        description: "",
+        issueDate: "",
+        thesisDate: "",
+        completed: false
+      },
+      readOnly: null,
+      type: "", // если не readOnly - получаем type из params роутера
+      taskData: {}, // если не readOnly - получаем taskData из params роутера
+      disciplines: []
+    };
+  },
+  computed: {
+    ...mapState("user", ["profile"]),
+    ...mapState("auth", ["token"]),
+    pageTitle() {
+      return !this.readOnly ? "Текущее задание" : this.taskData.name;
+    },
+    colorData() {
+      if (this.taskData.completed) {
+        return "green";
+      } else {
+        return "red";
+      }
+    },
+
+    taskType() {
+      switch (this.type) {
+        case "labs":
+          return "Лабораторная работа";
+        case "courses":
+          return "Курсовая работа";
+      }
+      return "";
+    },
+    status() {
+      switch (this.taskData.completed) {
+        case true:
+          return "Выполнена";
+        default:
+          return "В процессе";
+      }
+    },
+    today() {
+      const date = new Date();
+      const months = [
+        "января",
+        "февраля",
+        "марта",
+        "апреля",
+        "мая",
+        "июня",
+        "июля",
+        "августа",
+        "сентября",
+        "октября",
+        "ноября",
+        "декабря"
+      ];
+      return `${date.getDate()} ${
+        months[date.getMonth()]
+      } ${date.getFullYear()} г.`;
+    }
+  },
+  methods: {
+    ...mapActions("tasks", [
+      "CHANGE_TASK",
+      "CREATE_TASK",
+      "SEARCH_STUDENTS",
+      "GET_TASK",
+      "UPLOAD",
+      "DOWNLOAD_REPORT",
+      "GET_DISCIPLINES"
+    ]),
+    ...mapActions("user", ["FIND_USERS"]),
+
+    uploadFile() {
+      // чтобы отправить файлы
+      this.$refs.upload.submit();
+    },
+    handleFileUpload() {
+      this.file = this.$refs.file.files[0];
+    },
+    async querySearch(value, callback) {
+      try {
+        const result = await Promise.resolve(
+          this.FIND_USERS({
+            fio: value,
+            role_filter: "student"
+          })
+        );
+        console.log(result)
+        callback(result);
+      } catch (e) {
+          this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    },
+    handleSelect(item) {
+      this.autocompleteValue = this.newTaskData.fio = item.fio;
+      this.newTaskData.id = item.id;
+      // при получении item, заполняются поля newTaskData (telnum, faculty, group, mail)
+      this.newTaskData.telnum = item.phone;
+      this.newTaskData.faculty = item.faculty;
+      this.newTaskData.group = item.group;
+      this.newTaskData.mail = item.email;
+      this.newTaskData.user_id = item.id;
+    },
+    handleDropDownSelect(command) {
+      this.newTaskData.discipline = command;
+    },
+    async createTask() {
+      try {
+        this.newTaskData.users = [{id: this.newTaskData.user_id}]
+        await Promise.all([
+          this.CREATE_TASK({ taskData: this.newTaskData, taskType: this.type })
+        ]);
+        this.readOnly = true;
+        this.taskData = this.newTaskData;
+      } catch (err) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    },
+    addAttachment(file) {
+      try {
+        this.UPLOAD({ file: file, id: this.taskData.id });
+        this.taskData.completed = true;
+        this.$notify({
+          title: "Успешно!",
+          message: "Файл загружен"
+        });
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    },
+    submitFile() {
+      console.log(this.UPLOAD(this.file));
+    },
+    downloadReport() {
+      try {
+        this.DOWNLOAD_REPORT({ id: this.taskData.id });
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    }
+  },
+  async mounted() {
+    if (!this.$route.params.type) this.$router.push({ name: "home" });
+    this.readOnly = this.$route.params.readOnly;
+    this.type = this.$route.params.type;
+    this.taskData = Object.assign(this.taskData, this.$route.params.taskData);
+    if (this.readOnly) {
+      try {
+        const result = await this.GET_TASK({
+          taskType: this.type,
+          id: this.taskData.id
+        });
+        this.taskData = result;
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    }
+
+    if (!this.readOnly) {
+      this.newTaskData.issueDate = this.today; // кол-во мс, прошедших с 01.01.1970 г. по UTC
+      try {
+        const result = await this.GET_DISCIPLINES();
+        console.log(result)
+        this.disciplines = result.disciplines;
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    }
+  }
+
+};
+</script>
+
+<style scoped lang="scss">
+.el-dropdown-link {
+  cursor: pointer;
+  color: var(--background);
+}
+.el-icon-arrow-down {
+  font-size: 12px;
+}
+.task {
+  padding: 24px;
+  background: var(--white);
+  border-radius: var(--border-radius);
+  &__desc {
+    font-family: "Exo 2";
+    width: 75%;
+    min-height: 50px;
+    font-size: 16px;
+  }
+  &__info {
+    display: grid;
+    grid-template: auto / repeat(4, 1fr);
+    grid-gap: 24px;
+  }
+  &__input {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+.autocomplete,
+.calendar {
+  width: 100%;
+  max-width: 400px;
+}
+.title {
+  right: 0;
+  width: 30%;
+}
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.page-head-div {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 70%;
+}
+.task-type {
+  width: fit-content;
+  padding: 8px 12px;
+  margin-right: 8px;
+  border-radius: 24px;
+  background: #9b9b9b;
+  color: var(--white);
+}
+.task-completed {
+  width: fit-content;
+  padding: 8px 12px;
+  margin-right: 8px;
+  border-radius: 24px;
+  background: var(--primary);
+  color: var(--white);
+}
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+</style>

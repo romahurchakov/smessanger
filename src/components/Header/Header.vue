@@ -1,11 +1,11 @@
 <template>
   <header class="header">
     <div class="wrapper">
-    <router-link :to="{name:'home'}" class="wrapper__logo">
-      <img src="../../assets/images/keklol.png" width="150" />
-    </router-link>
-    <Navigation class="wrapper__nav" />
-    <Auth class="wrapper__auth" />
+      <router-link :to="{name:'home'}" class="wrapper__logo">
+        <img src="../../assets/images/keklol.png" width="150" />
+      </router-link>
+      <Navigation class="wrapper__nav" />
+      <Auth class="wrapper__auth" v-if="!isAuth" />
     </div>
   </header>
 </template>
@@ -15,13 +15,22 @@
 <script>
 import Auth from "./Auth/Auth.vue";
 import Navigation from "./Navigation/Navigation.vue";
+import store from "@/store/store";
 
 export default {
   name: "Header",
   components: {
     Auth,
     Navigation
-  }
+  },
+  computed: {
+    getActive() {
+      return this.$route.name;
+    },
+    isAuth() {
+      return store.getters["user/name"];
+    }
+  },
 };
 </script>
 
@@ -65,9 +74,9 @@ export default {
 
 <style>
 header .el-menu-item {
-  background-color: unset!important;
+  background-color: unset !important;
 }
 header .el-menu {
-  background-color: unset!important;
+  background-color: unset !important;
 }
 </style>

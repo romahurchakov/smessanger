@@ -88,13 +88,19 @@ export default {
 
     &__icon {
       padding: 5px;
-      filter: invert(72%) sepia(3%) saturate(21%) hue-rotate(0deg) brightness(85%) contrast(93%);
+      filter: invert(72%) sepia(3%) saturate(21%) hue-rotate(0deg)
+        brightness(85%) contrast(93%);
     }
 
     &__description {
       margin-left: 5px;
       color: #9b9b9b;
     }
+  }
+
+  .vl {
+    border-left: 6px solid green;
+    height: 500px;
   }
 }
 </style>
