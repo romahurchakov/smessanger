@@ -19,7 +19,8 @@ const state = {
 
 const getters = {
     i: state => !state.profile.name || !state.login,
-    name: state => state.profile.name
+    name: state => state.profile.name,
+    isAdmin: state => state.profile.role.admin
 };
 
 const isTeacher = function (element) {
@@ -61,6 +62,55 @@ const actions = {
             params: params
         }).then(({ data }) => {
             return data.users
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    GET_USERS() {
+        return apiClient.get('/api/users').then(({ data }) => {
+            return data.users
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    GET_GROUPS() {
+        return apiClient.get('/api/groups').then(({ data }) => {
+            return data.groups
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    GET_ROLES() {
+        return apiClient.get('/api/list/roles').then(({ data }) => {
+            return data.roles
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    CREATE_USER(_, user ) {
+        return apiClient.post('/api/users', user ).then(({ data }) => {
+            return data
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    UPDATE_USER(_, user) {
+        return apiClient.patch(`/api/users/${user.id}`, user).then(({ data }) => {
+            return data
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    DELETE_USER(_, id) {
+        return apiClient.delete(`/api/users/${id}`).then(({ data }) => {
+            return data
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    GET_USER(_, id) {
+        return apiClient.get(`/api/users/${id}`).then(({ data }) => {
+            return data
         }).catch(err => {
             return errHandler(err)
         })

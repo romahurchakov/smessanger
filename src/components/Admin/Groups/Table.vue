@@ -1,0 +1,235 @@
+<template>
+  <div class="home">
+    <div class="article">
+      <div class="fl mb-24">
+        <el-autocomplete
+          class="autocomplete mr-24"
+          v-model="autocompleteValue"
+          :trigger-on-focus="false"
+          :fetch-suggestions="querySearch"
+          placeholder="Начните вводить"
+          @select="handleSelect"
+        >
+          <i class="el-icon-search el-input__icon" slot="suffix" />
+          <template slot-scope="{ item }">
+            <div v-if="item.name">{{ item.name }}</div>
+            <div v-else>Поиск не дал результатов</div>
+          </template>
+        </el-autocomplete>
+        <Button
+          type="primary"
+          :label="createBtnLabel"
+          width="300"
+          @click="isShowCreatePopup = true"
+        />
+        <el-dialog title="Создание группы" :visible.sync="isShowCreatePopup">
+          <div slot="footer" class="btn-footer">
+            <Button
+              type="reject"
+              label="Отменить"
+              width="150"
+              class="mr-24"
+              @click="isShowCreatePopup = false"
+            />
+            <Button type="primary" label="Создать" width="150" @click="createUser" />
+          </div>
+        </el-dialog>
+      </div>
+      <el-table
+        :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"
+        empty-text="Нет данных"
+      >
+        <el-table-column prop="fio" label="Название" :filters="filter" :filter-method="filterHandler" />
+        <el-table-column prop="login" label="Численность" />
+        <el-table-column width="50px">
+          <template slot-scope="scope">
+            <i @click="isShowDeletePopup = true; id = scope.$index" class="el-icon-delete" />
+          </template>
+        </el-table-column>
+        <el-table-column width="50px">
+          <template slot-scope="scope">
+            <i @click="updateUser(tableData[scope.$index])" class="el-icon-edit" />
+            <el-dialog
+              title="Хотите удалить задание"
+              :visible.sync="isShowDeletePopup"
+              width="550px"
+            >
+              <p>Вы уверены, что хотите удалить группу?</p>
+              <div slot="footer" class="btn-footer">
+                <Button
+                  type="reject"
+                  label="Отменить"
+                  width="150"
+                  class="mr-24"
+                  @click="isShowDeletePopup = false"
+                />
+                <Button
+                  type="primary"
+                  label="Да, удалить"
+                  width="150"
+                  @click="deleteUser(tableData[scope.$index])"
+                />
+              </div>
+            </el-dialog>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+  </div>
+</template>
+
+<script>
+import Button from "@/components/ui/Button/Button";
+import { mapState, mapActions } from "vuex";
+export default {
+  components: {
+    Button
+  },
+  props: {
+    tableData: { type: Array }
+  },
+  data() {
+    return {
+      isShowDeletePopup: false,
+      isShowCreatePopup: false,
+      autocompleteValue: "",
+      id: -1,
+      filter: [{ text: "asd", value: "asd" }],
+      creating: {},
+      roles: []
+    };
+  },
+  computed: {
+    ...mapState("user", ["profile"]),
+    createBtnLabel() {
+      return "Создать группу";
+    }
+  },
+  methods: {
+    ...mapActions("tasks", ["EXCEL"]),
+    ...mapActions("user", [
+      "GET_ROLES",
+      "CREATE_USER",
+      "GET_USERS",
+      "DELETE_USER"
+    ]),
+    async createUser() {
+      try {
+        await this.CREATE_USER({
+          fio: this.creating.fio,
+          login: this.creating.login,
+          password: this.creating.password,
+          phone: this.creating.phone,
+          email: this.creating.email,
+          faculty: "ИУ9",
+          group: this.creating.group,
+          roles: [{ id: this.creating.role }]
+        });
+        this.tableData.push({
+          fio: this.creating.fio,
+          login: this.creating.login,
+          password: this.creating.password,
+          phone: this.creating.phone,
+          email: this.creating.email,
+          faculty: "ИУ9",
+          group: this.creating.group,
+          roles: [{ id: this.creating.role }]
+        });
+        this.creating = {};
+        this.isShowCreatePopup = false;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async deleteUser(row) {
+      try {
+        await this.DELETE_USER(row.id);
+        this.tableData = this.tableData.filter(elem => elem.id != row.id);
+        this.isShowDeletePopup = false;
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    updateUser(row) {
+      this.$router.push({
+        name: "change-user",
+        params: {
+          id: row.id
+        }
+      });
+    },
+    querySearch(value, callback) {
+      try {
+        // const results = await this.SEARCH_STUDENTS({ fio: value })
+        // if (Array.isArray(results)) callback(results);
+        const regex = new RegExp(".*" + this.autocompleteValue + ".*", "g");
+        callback(
+          this.tableData.filter(elem => {
+            if (!elem.name) return;
+            elem.name.match(regex);
+          })
+        );
+      } catch (e) {
+        console.log(e);
+        callback([{}]);
+      }
+    },
+    handleSelect(item) {
+      this.autocompleteValue = item.name;
+      this.filter = [item.name];
+    },
+    filterHandler(value, row, column) {
+      const property = column["property"];
+      return row[property] === value;
+    }
+  },
+  async mounted() {
+    try {
+      const result = await this.GET_ROLES();
+      this.roles = result;
+    } catch (e) {
+      this.$notify.error({
+        title: "Ошибка!",
+        message: "Что-то пошло не так"
+      });
+    }
+  }
+};
+</script>
+
+<style>
+.task-input {
+  width: 100%;
+  max-width: 300px;
+}
+.article {
+  background: var(--white);
+  padding: 24px;
+}
+.autocomplete {
+  width: 100%;
+  max-width: 400px;
+}
+.excel {
+  float: right;
+  margin-right: 10px;
+  margin-top: 15px;
+}
+.el-select .el-input {
+  width: 110px;
+}
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+}
+.input {
+  margin-top: 10px;
+}
+.create_popup {
+  display: flex;
+  flex-direction: column;
+}
+.flex {
+  display: flex;
+  align-items: center;
+}
+</style>

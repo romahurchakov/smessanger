@@ -9,7 +9,7 @@
                 <el-tab-pane label="Лабы" name="labs" class="tab-opener">
                     <TaskTable :tableData="tableDataLabs" type="labs" :deleteTask="deleteTask"/>
                 </el-tab-pane>
-                <el-tab-pane label="Курсовые" name="courses" class="tab-opener" disabled=true>
+                <el-tab-pane label="Курсовые" name="courses" class="tab-opener" :disabled="true">
                     <TaskTable :tableData="tableDataCourses" type="courses" :deleteTask="deleteTask"/>
                 </el-tab-pane>
             </el-tabs>

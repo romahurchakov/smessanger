@@ -52,6 +52,42 @@ const router = new Router({
                 requiresAuth: true,
             },
             component: () => import(/* webpackChunkName: "task" */ './components/TaskPage/TaskPage')
+        },
+        {
+            path: '/admin/users',
+            name: 'user-settings',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Admin/Users/Users')
+        },
+        {
+            path: '/admin/groups',
+            name: 'group-settings',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Admin/Groups/Groups')
+        },
+        {
+            path: '/admin/management',
+            name: 'management',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Admin/Management')
+        },
+        {
+            path: '/admin/users/:id',
+            name: 'change-user',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Admin/Users/ChangeUser')
         }
     ]
 });
