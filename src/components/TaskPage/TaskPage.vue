@@ -1,23 +1,52 @@
 <template>
-  <main class="page-with-crumbs">
+  <main class="page">
     <div class="page-head mb-40">
       <h1 class="title">{{ pageTitle }}</h1>
       <div class="page-head-div">
-        <div
-          :style="{backgroundColor: colorData}"
-          class="task-completed"
-          v-if="readOnly"
-        >{{ status }}</div>
         <div class="task-type">{{ taskType }}</div>
       </div>
     </div>
     <section class="task mb-40">
       <div class="task__info mb-24">
-        <div class="task__input" v-if="!readOnly">
-          <p class="hint-text mb-8">Введите название задания</p>
-          <el-input placeholder="Введите название" v-model="newTaskData.title" />
+        <div class="flex">
+          <div class="task__input rigt-auto" v-if="!readOnly">
+            <p class="hint-text mb-8">Введите название задания</p>
+            <el-input placeholder="Введите название" v-model="newTaskData.title" />
+          </div>
+          <div class="mr20">
+            <p class="hint-text mb-8">Дисциплина</p>
+            <p v-if="readOnly">{{ taskData.discipline }}</p>
+            <el-select v-else v-model="newTaskData.discipline" placeholder="Укажите вашу роль">
+              <el-option
+                v-for="discipline in disciplines"
+                :key="discipline.id"
+                :label="discipline.name"
+                :value="discipline.name"
+              ></el-option>
+            </el-select>
+          </div>
+          <div class="task__input">
+            <p class="hint-text mb-8">Крайний срок сдачи</p>
+            <p v-if="readOnly">{{ taskData.thesisDate }}</p>
+            <el-date-picker
+              v-if="profile.role.teacher"
+              v-model="newTaskData.thesisDate"
+              popper-class="date"
+              :picker-options="datePickerOptions"
+              class="calendar"
+              value-format="yyyy.MM.dd"
+              format="d MMM yyyy г."
+              type="date"
+              placeholder="Выберите день"
+            />
+          </div>
         </div>
-        <div class="task__input" v-if="!readOnly">
+        <div class="mb-24">
+          <p class="hint-text mb-8 mgt">Описание задания</p>
+          <p v-if="readOnly" class="text-style">{{ taskData.description || '-' }}</p>
+          <textarea v-else v-model="newTaskData.description" class="task__desc" />
+        </div>
+        <div class="task__input mgt" v-if="!readOnly">
           <p class="hint-text mb-8">Поиск студента по ФИО</p>
           <p v-if="readOnly">{{ taskData.fio }}</p>
           <el-autocomplete
@@ -37,54 +66,61 @@
           </el-autocomplete>
         </div>
       </div>
-      <div class="mb-24">
-        <p class="hint-text mb-8">Описание задания</p>
-        <p v-if="readOnly" class="text-style">{{ taskData.description || '-' }}</p>
-        <textarea v-else v-model="newTaskData.description" class="task__desc" />
-      </div>
       <div class="task__info">
-        <TaskInput
-          :value="readOnly ? taskData.telnum : newTaskData.telnum"
-          hint="Номер телефона студента"
-        />
-        <TaskInput :value="readOnly ? taskData.mail : newTaskData.mail" hint="Почтовый адрес" />
-        <TaskInput :value="readOnly ? taskData.faculty : newTaskData.faculty" hint="Факультет" />
-        <TaskInput :value="readOnly ? taskData.group : newTaskData.group" hint="Группа" />
-        <div class="task__input">
-          <p class="hint-text mb-8">Дисциплина</p>
-          <p v-if="readOnly">{{ taskData.discipline }}</p>
-          <el-select v-else v-model="newTaskData.discipline" placeholder="Укажите вашу роль">
-            <el-option v-for='discipline in disciplines' :key='discipline.id' :label='discipline.name' :value="discipline.name"></el-option>
-
-          </el-select>
-        </div>
-        <div class="task__input">
-          <p class="hint-text mb-8">Дата создания</p>
-          <p v-if="readOnly">{{ taskData.issueDate }}</p>
-          <p v-else>{{ today }}</p>
-        </div>
-        <div class="task__input">
-          <p class="hint-text mb-8">Крайний срок сдачи</p>
-          <p v-if="readOnly">{{ taskData.thesisDate }}</p>
-          <el-date-picker
-            v-if="profile.role.teacher"
-            v-model="newTaskData.thesisDate"
-            popper-class="date"
-            :picker-options="datePickerOptions"
-            class="calendar"
-            value-format="yyyy.MM.dd"
-            format="d MMM yyyy г."
-            type="date"
-            placeholder="Выберите день"
-          />
-        </div>
-        <div class="task__input">
-          <div v-if="taskData.completed && profile.role.teacher">
-            <Button label="Скачать" type="info" @click="downloadReport">
-              <DownloadIcon width="24" height="24" />
-            </Button>
-          </div>
-        </div>
+        <el-table
+          :data="readOnly ? taskData.users : newTaskData.users"
+          empty-text="Нет данных"
+          :row-class-name="tableRowClassName"
+        >
+          <el-table-column prop="fio" label="ФИО" />
+          <el-table-column prop="login" label="Логин" />
+          <el-table-column prop="faculty" label="Факультет" />
+          <el-table-column prop="group" label="Группа" />
+          <el-table-column prop="phone" label="Телефон" />
+          <el-table-column prop="email" label="Почта" />
+          <el-table-column width="50px">
+            <template slot-scope="scope">
+              <i @click="isShowDeletePopup = true; id = scope.$index" class="el-icon-delete" />
+            </template>
+          </el-table-column>
+          <el-table-column width="50px">
+            <template slot-scope="scope">
+              <el-dialog
+                title="Хотите удалить задание"
+                :visible.sync="isShowDeletePopup"
+                width="550px"
+              >
+                <p>Вы уверены, что хотите удалить пользователя?</p>
+                <div slot="footer" class="btn-footer">
+                  <Button
+                    type="reject"
+                    label="Отменить"
+                    width="150"
+                    class="mr-24"
+                    @click="isShowDeletePopup = false"
+                  />
+                  <Button
+                    type="primary"
+                    label="Да, удалить"
+                    width="150"
+                    @click="readOnly? deleteUser(taskData.users[scope.$index].id): deleteUser(newTaskData.users[scope.$index].id)"
+                  />
+                </div>
+              </el-dialog>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="readOnly">
+            <template slot-scope="scope">
+              <div
+                v-if="readOnly? taskData.users[scope.$index].completed && profile.role.teacher: false"
+              >
+                <Button label="Скачать" type="info" @click="downloadReport(scope)">
+                  <i src="@/assets/icons/download.svg" width="24" height="24" />
+                </Button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </section>
     <div class="actions">
@@ -120,15 +156,11 @@
 </template>
 
 <script>
-import TaskInput from "./TaskInput/TaskInput";
 import Button from "@/components/ui/Button/Button";
-import DownloadIcon from "@/assets/icons//download.svg";
 import { mapState, mapActions } from "vuex";
 export default {
   components: {
-    TaskInput,
-    Button,
-    DownloadIcon
+    Button
   },
   data() {
     return {
@@ -151,15 +183,18 @@ export default {
       },
       readOnly: null,
       type: "", // если не readOnly - получаем type из params роутера
-      taskData: {}, // если не readOnly - получаем taskData из params роутера
-      disciplines: []
+      taskData: {
+        users: []
+      }, // если не readOnly - получаем taskData из params роутера
+      disciplines: [],
+      isShowDeletePopup: false
     };
   },
   computed: {
     ...mapState("user", ["profile"]),
     ...mapState("auth", ["token"]),
     pageTitle() {
-      return !this.readOnly ? "Текущее задание" : this.taskData.name;
+      return !this.readOnly ? "Создание задания" : this.taskData.name;
     },
     colorData() {
       if (this.taskData.completed) {
@@ -177,14 +212,6 @@ export default {
           return "Курсовая работа";
       }
       return "";
-    },
-    status() {
-      switch (this.taskData.completed) {
-        case true:
-          return "Выполнена";
-        default:
-          return "В процессе";
-      }
     },
     today() {
       const date = new Date();
@@ -215,7 +242,8 @@ export default {
       "GET_TASK",
       "UPLOAD",
       "DOWNLOAD_REPORT",
-      "GET_DISCIPLINES"
+      "GET_DISCIPLINES",
+      "DELETE_USER"
     ]),
     ...mapActions("user", ["FIND_USERS"]),
 
@@ -234,31 +262,52 @@ export default {
             role_filter: "student"
           })
         );
-        console.log(result)
         callback(result);
       } catch (e) {
-          this.$notify.error({
+        this.$notify.error({
           title: "Ошибка!",
           message: "Что-то пошло не так"
         });
       }
     },
     handleSelect(item) {
-      this.autocompleteValue = this.newTaskData.fio = item.fio;
-      this.newTaskData.id = item.id;
-      // при получении item, заполняются поля newTaskData (telnum, faculty, group, mail)
-      this.newTaskData.telnum = item.phone;
-      this.newTaskData.faculty = item.faculty;
-      this.newTaskData.group = item.group;
-      this.newTaskData.mail = item.email;
-      this.newTaskData.user_id = item.id;
+      if (!this.newTaskData.users) {
+        this.newTaskData.users = [];
+      }
+      this.newTaskData.users.push({
+        id: item.id,
+        fio: item.fio,
+        phone: item.phone,
+        faculty: item.faculty,
+        group: item.group,
+        email: item.email,
+        user_id: item.id
+      });
+      this.autocompleteValue = "";
+    },
+    async deleteUser(id) {
+      if (!this.readOnly) {
+        this.newTaskData.users = this.newTaskData.users.filter(
+          elem => elem.id != id
+        );
+      } else {
+        try {
+          await this.DELETE_USER({id:this.taskData.id,user_id: id});
+          this.taskData.users = this.taskData.users.filter(elem => elem.id != id)
+        } catch (err) {
+          this.$notify.error({
+            title: "Ошибка!",
+            message: "Что-то пошло не так"
+          });
+        }
+      }
+      this.isShowDeletePopup = false;
     },
     handleDropDownSelect(command) {
       this.newTaskData.discipline = command;
     },
     async createTask() {
       try {
-        this.newTaskData.users = [{id: this.newTaskData.user_id}]
         await Promise.all([
           this.CREATE_TASK({ taskData: this.newTaskData, taskType: this.type })
         ]);
@@ -298,6 +347,14 @@ export default {
           message: "Что-то пошло не так"
         });
       }
+    },
+    tableRowClassName({ row, rowIndex}) {
+      rowIndex == 'kek'
+      if (row.completed) {
+        return "success-row";
+      } else {
+        return "common-row";
+      }
     }
   },
   async mounted() {
@@ -324,7 +381,6 @@ export default {
       this.newTaskData.issueDate = this.today; // кол-во мс, прошедших с 01.01.1970 г. по UTC
       try {
         const result = await this.GET_DISCIPLINES();
-        console.log(result)
         this.disciplines = result.disciplines;
       } catch (e) {
         this.$notify.error({
@@ -334,11 +390,16 @@ export default {
       }
     }
   }
-
 };
 </script>
 
 <style scoped lang="scss">
+.page {
+  padding-top: 30px;
+}
+.mgt {
+  margin-top: 10px;
+}
 .el-dropdown-link {
   cursor: pointer;
   color: var(--background);
@@ -357,9 +418,8 @@ export default {
     font-size: 16px;
   }
   &__info {
-    display: grid;
-    grid-template: auto / repeat(4, 1fr);
-    grid-gap: 24px;
+    display: flex;
+    flex-direction: column;
   }
   &__input {
     width: 100%;
@@ -406,5 +466,26 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+.flex {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  margin-top: 10px;
+}
+.rigt-auto {
+  margin-right: auto;
+}
+
+.mr20 {
+  margin-right: 20px;
+}
+
+.el-table .common-row {
+  background: #e46363;
+}
+
+.el-table .success-row {
+  background: #90e463;
 }
 </style>

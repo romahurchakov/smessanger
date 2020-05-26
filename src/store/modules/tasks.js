@@ -35,12 +35,7 @@ const actions = {
                             issueDate: elem.created_at,
                             thesisDate: elem.thesis_date,
                             name: elem.name,
-                            fio: elem.users[0].fio,
-                            faculty: elem.users[0].faculty,
-                            group: elem.users[0].group,
-                            mail: elem.users[0].email,
-                            telnum: elem.users[0].phone,
-                            user_id: elem.users[0].id,
+                            users: data.users
                         }
                     } else {
                         return {
@@ -83,12 +78,7 @@ const actions = {
                         issueDate: data.created_at,
                         thesisDate: data.thesis_date,
                         name: data.name,
-                        user_id: data.users[0].id,
-                        fio: data.users[0].fio,
-                        faculty: data.users[0].faculty,
-                        group: data.users[0].group,
-                        mail: data.users[0].email,
-                        telnum: data.users[0].phone,
+                        users: data.users
                     }
                 } else {
                     return {
@@ -119,7 +109,6 @@ const actions = {
         console.log(url)
         return apiClient.delete(url)
             .then(({ data }) => {
-                console.log('Обрабатываем успешный ответ', data)
                 return data
             })
     },
@@ -144,7 +133,6 @@ const actions = {
             users: taskData.users,
         })
             .then(({ data }) => {
-                console.log('Обрабатываем успешный ответ', data)
                 return data
             })
     },
@@ -152,7 +140,6 @@ const actions = {
         let url = '/api/report'
         return apiClient.get(url, {responseType: 'blob'})
             .then(({ data }) => {
-                console.log('Обрабатываем успешный ответ', data)
                 return data
             })
     },
@@ -162,7 +149,6 @@ const actions = {
         let url = `/api/labs/${id}/report`
         return apiClient.put(url, formData, { headers: { 'Content-Type': 'multipart/form-data'}})
             .then(({ data }) => {
-                console.log('Обрабатываем успешный ответ', data)
                 return data
             })
     },
@@ -176,6 +162,12 @@ const actions = {
     GET_DISCIPLINES() {
         let url = '/api/list/disciplines'
         return apiClient.get(url)
+            .then(({ data }) => {
+                return data
+            })
+    },
+    DELETE_USER(_, { id, user_id }) {
+        return apiClient.delete(`/api/labs/${id}/${user_id}`)
             .then(({ data }) => {
                 return data
             })

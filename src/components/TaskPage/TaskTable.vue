@@ -17,12 +17,9 @@
             </div>
             <el-table :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"  @row-click="onTableClickHandler" empty-text="Нет данных">
                 <el-table-column prop="name" label="Название" :filters=filter :filter-method="filterHandler"/>
-                <el-table-column prop="fio" label="ФИО"/>
-                <el-table-column prop="faculty" label="Факультет"/>
-                <el-table-column prop="group" label="Группа"/>
                 <el-table-column prop="discipline" label="Дисциплина"/>
                 <el-table-column prop="thesisDate" label="Дедлайн"/>
-                <el-table-column v-if="profile.role.teacher">
+                <el-table-column v-if="profile.role.teacher" width="150px">
                     <template slot-scope="scope">
                         <Button @click="isShowPopup = true; id = scope.$index" label="Удалить"/>
                     </template>
@@ -162,5 +159,8 @@
         float: right;
         margin-right: 10px;
         margin-top: 15px;
+    }
+    .delete {
+        width: 150px;
     }
 </style>
