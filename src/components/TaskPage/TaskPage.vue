@@ -292,8 +292,10 @@ export default {
         );
       } else {
         try {
-          await this.DELETE_USER({id:this.taskData.id,user_id: id});
-          this.taskData.users = this.taskData.users.filter(elem => elem.id != id)
+          await this.DELETE_USER({ id: this.taskData.id, user_id: id });
+          this.taskData.users = this.taskData.users.filter(
+            elem => elem.id != id
+          );
         } catch (err) {
           this.$notify.error({
             title: "Ошибка!",
@@ -348,8 +350,8 @@ export default {
         });
       }
     },
-    tableRowClassName({ row, rowIndex}) {
-      rowIndex == 'kek'
+    tableRowClassName({ row, rowIndex }) {
+      rowIndex == "kek";
       if (row.completed) {
         return "success-row";
       } else {
@@ -480,12 +482,13 @@ export default {
 .mr20 {
   margin-right: 20px;
 }
+</style>
 
+<style>
 .el-table .common-row {
-  background: #e46363;
 }
 
 .el-table .success-row {
-  background: #90e463;
+  background: #c2eeaa;
 }
 </style>

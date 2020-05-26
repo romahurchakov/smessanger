@@ -137,7 +137,7 @@ const actions = {
             })
     },
     EXCEL() {
-        let url = '/api/report'
+        let url = '/api/labs/report'
         return apiClient.get(url, {responseType: 'blob'})
             .then(({ data }) => {
                 return data
