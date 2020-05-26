@@ -59,7 +59,7 @@ export default {
       adminMenuItems: [
         { label: "Настройка пользователей", linkTo: "user-settings", disabled: false },
         { label: "Настройка групп", linkTo: "group-settings", disabled: false },
-        { label: "Управление сайтом", linkTo: "management", disabled: false }
+        { label: "Управление сайтом", linkTo: "management", disabled: true }
       ],
       name: ""
     };

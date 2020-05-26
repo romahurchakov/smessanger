@@ -115,6 +115,36 @@ const actions = {
             return errHandler(err)
         })
     },
+    GET_GROUP(_, id) {
+        return apiClient.get(`/api/groups/${id}`).then(({ data }) => {
+            return data
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    UPDATE_GROUP(_, {id, data}) {
+        console.log("KEK")
+        return apiClient.patch(`/api/groups/${id}`, data).then(({ data }) => {
+            return data
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    DELETE_GROUP(_, id) {
+        console.log("KEK")
+        return apiClient.delete(`/api/groups/${id}`).then(({ data }) => {
+            return data
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    CREATE_GROUP(_, data) {
+        return apiClient.post(`/api/groups`, data).then(({ data }) => {
+            return data
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
 };
 
 const mutations = {

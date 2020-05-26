@@ -6,15 +6,15 @@
       mode="horizontal"
       active-text-color="#ffd04b"
       background-color="#091928"
+      :router="true"
     >
       <el-menu-item
         v-for="item in menuItems"
         :key="item.label"
         :index="item.linkTo"
         :disabled="item.disabled"
-      >
-        <RouterLink :to="{ name: item.linkTo}">{{ item.label }}</RouterLink>
-      </el-menu-item>
+        :route="{ name: item.linkTo}"
+      >{{ item.label }}</el-menu-item>
     </el-menu>
   </div>
 </template>

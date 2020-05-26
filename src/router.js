@@ -72,6 +72,15 @@ const router = new Router({
             component: () => import(/* webpackChunkName: "task" */ './components/Admin/Groups/Groups')
         },
         {
+            path: '/admin/groups/:id',
+            name: 'change-group',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Admin/Groups/ChangeGroup')
+        },
+        {
             path: '/admin/management',
             name: 'management',
             meta: {

@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="page">
     <div class="wrapper">
       <div class="flex">
         <div class="mb-24">
@@ -139,6 +139,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.page {
+  width: 30%;
+}
 .wrapper {
   display: flex;
   padding: 20px;

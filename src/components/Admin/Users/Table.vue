@@ -266,6 +266,5 @@ export default {
 }
 .flex {
   display: flex;
-  align-items: center;
 }
 </style>

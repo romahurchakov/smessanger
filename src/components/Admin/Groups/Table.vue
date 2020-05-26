@@ -23,6 +23,8 @@
           @click="isShowCreatePopup = true"
         />
         <el-dialog title="Создание группы" :visible.sync="isShowCreatePopup">
+          <p class="hint-text mb-8">Название группы</p>
+          <el-input placeholder="Название" v-model="creating.name" />
           <div slot="footer" class="btn-footer">
             <Button
               type="reject"
@@ -31,7 +33,7 @@
               class="mr-24"
               @click="isShowCreatePopup = false"
             />
-            <Button type="primary" label="Создать" width="150" @click="createUser" />
+            <Button type="primary" label="Создать" width="150" @click="createGroup" />
           </div>
         </el-dialog>
       </div>
@@ -39,8 +41,13 @@
         :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"
         empty-text="Нет данных"
       >
-        <el-table-column prop="fio" label="Название" :filters="filter" :filter-method="filterHandler" />
-        <el-table-column prop="login" label="Численность" />
+        <el-table-column
+          prop="name"
+          label="Название"
+          :filters="filter"
+          :filter-method="filterHandler"
+        />
+        <el-table-column prop="num" label="Численность" />
         <el-table-column width="50px">
           <template slot-scope="scope">
             <i @click="isShowDeletePopup = true; id = scope.$index" class="el-icon-delete" />
@@ -48,9 +55,9 @@
         </el-table-column>
         <el-table-column width="50px">
           <template slot-scope="scope">
-            <i @click="updateUser(tableData[scope.$index])" class="el-icon-edit" />
+            <i @click="updateGroup(tableData[scope.$index])" class="el-icon-edit" />
             <el-dialog
-              title="Хотите удалить задание"
+              title="Хотите удалить группу"
               :visible.sync="isShowDeletePopup"
               width="550px"
             >
@@ -67,7 +74,7 @@
                   type="primary"
                   label="Да, удалить"
                   width="150"
-                  @click="deleteUser(tableData[scope.$index])"
+                  @click="deleteGroup(scope.$index)"
                 />
               </div>
             </el-dialog>
@@ -80,7 +87,7 @@
 
 <script>
 import Button from "@/components/ui/Button/Button";
-import { mapState, mapActions } from "vuex";
+import { mapActions } from "vuex";
 export default {
   components: {
     Button
@@ -100,59 +107,40 @@ export default {
     };
   },
   computed: {
-    ...mapState("user", ["profile"]),
     createBtnLabel() {
       return "Создать группу";
     }
   },
   methods: {
-    ...mapActions("tasks", ["EXCEL"]),
-    ...mapActions("user", [
-      "GET_ROLES",
-      "CREATE_USER",
-      "GET_USERS",
-      "DELETE_USER"
-    ]),
-    async createUser() {
+    ...mapActions("user", ["DELETE_GROUP", "CREATE_GROUP"]),
+    async createGroup() {
       try {
-        await this.CREATE_USER({
-          fio: this.creating.fio,
-          login: this.creating.login,
-          password: this.creating.password,
-          phone: this.creating.phone,
-          email: this.creating.email,
-          faculty: "ИУ9",
-          group: this.creating.group,
-          roles: [{ id: this.creating.role }]
-        });
-        this.tableData.push({
-          fio: this.creating.fio,
-          login: this.creating.login,
-          password: this.creating.password,
-          phone: this.creating.phone,
-          email: this.creating.email,
-          faculty: "ИУ9",
-          group: this.creating.group,
-          roles: [{ id: this.creating.role }]
-        });
-        this.creating = {};
+        await this.CREATE_GROUP(this.creating);
         this.isShowCreatePopup = false;
-      } catch (e) {
-        console.log(e);
+        this.creating = {};
+        this.$emit('update-table')
+      } catch (err) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: err.message
+        });
       }
     },
-    async deleteUser(row) {
+    async deleteGroup(id) {
       try {
-        await this.DELETE_USER(row.id);
-        this.tableData = this.tableData.filter(elem => elem.id != row.id);
+        await this.DELETE_GROUP(this.tableData[id].id);
         this.isShowDeletePopup = false;
-      } catch (e) {
-        console.log(e);
+        this.$emit('update-table')
+      } catch (err) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: err.message
+        });
       }
     },
-    updateUser(row) {
+    updateGroup(row) {
       this.$router.push({
-        name: "change-user",
+        name: "change-group",
         params: {
           id: row.id
         }
@@ -181,17 +169,6 @@ export default {
     filterHandler(value, row, column) {
       const property = column["property"];
       return row[property] === value;
-    }
-  },
-  async mounted() {
-    try {
-      const result = await this.GET_ROLES();
-      this.roles = result;
-    } catch (e) {
-      this.$notify.error({
-        title: "Ошибка!",
-        message: "Что-то пошло не так"
-      });
     }
   }
 };
@@ -230,6 +207,5 @@ export default {
 }
 .flex {
   display: flex;
-  align-items: center;
 }
 </style>
