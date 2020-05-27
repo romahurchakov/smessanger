@@ -97,6 +97,24 @@ const router = new Router({
                 requiresAuth: true,
             },
             component: () => import(/* webpackChunkName: "task" */ './components/Admin/Users/ChangeUser')
+        },
+        {
+            path: '/chats',
+            name: 'chats',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Chats/Chats')
+        },
+        {
+            path: '/chats/creating',
+            name: 'chats-creating',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Chats/CreateChat')
         }
     ]
 });

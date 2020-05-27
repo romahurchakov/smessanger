@@ -123,6 +123,34 @@
         </el-table>
       </div>
     </section>
+    <div v-if="profile.role.teacher && !createChat && readOnly">
+      <Button
+        slot="trigger"
+        type="info"
+        label="Создать чат"
+        width="170"
+        style="margin-left: auto; color: black;"
+        @click="showChatCreation = true"
+      />
+      <el-dialog title="Создание чата" :visible.sync="showChatCreation" width="550px">
+        <p>Создать чат со всеми студентами, на которых назначена работа ?</p>
+        <div slot="footer" class="btn-footer">
+          <Button
+            type="reject"
+            label="Отменить"
+            width="150"
+            class="mr-24"
+            @click="showChatCreation = false"
+          />
+          <Button
+            type="primary"
+            label="Да, создать"
+            width="150"
+            @click="create_chat"
+          />
+        </div>
+      </el-dialog>
+    </div>
     <div class="actions">
       <el-upload
         v-if="profile.role.student"
@@ -187,7 +215,9 @@ export default {
         users: []
       }, // если не readOnly - получаем taskData из params роутера
       disciplines: [],
-      isShowDeletePopup: false
+      isShowDeletePopup: false,
+      createChat: false,
+      showChatCreation: false,
     };
   },
   computed: {
@@ -246,6 +276,7 @@ export default {
       "DELETE_USER"
     ]),
     ...mapActions("user", ["FIND_USERS"]),
+    ...mapActions("chat", ["CREATE_CHAT"]),
 
     uploadFile() {
       // чтобы отправить файлы
@@ -356,6 +387,18 @@ export default {
         return "success-row";
       } else {
         return "common-row";
+      }
+    },
+    async create_chat() {
+      try {
+        await this.CREATE_CHAT({name: this.taskData.name, users: this.taskData.users})
+        this.createChat = true;
+        this.showChatCreation = false
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
       }
     }
   },

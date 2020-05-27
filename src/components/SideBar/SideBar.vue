@@ -16,7 +16,7 @@
         :route="{ name: item.linkTo}"
       >
         <div>
-          <i class="el-icon-menu"></i>
+          <i :class="item.icon"></i>
           {{ item.label }}
         </div>
       </el-menu-item>
@@ -55,7 +55,7 @@ export default {
   },
   data() {
     return {
-      menuItems: [{ label: "Лабораторные", linkTo: "labs", disabled: false }],
+      menuItems: [{ label: "Работы", linkTo: "labs", disabled: false, icon:"el-icon-menu" }, {label: "Чаты", linkTo: "chats", disabled: false, icon:"el-icon-s-promotion"}],
       adminMenuItems: [
         { label: "Настройка пользователей", linkTo: "user-settings", disabled: false },
         { label: "Настройка групп", linkTo: "group-settings", disabled: false },
