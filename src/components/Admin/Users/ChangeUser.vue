@@ -36,9 +36,9 @@
           <p class="hint-text mb-8">Новый пароль</p>
           <el-input placeholder="Пароль" v-model="user.password" />
         </div>
-        <div class="input">
+        <div class="mb-24 w150">
           <p class="hint-text mb-8">Роль</p>
-          <el-select v-model="role" placeholder="Роли">
+          <el-select v-model="role" placeholder="Роли" class="w150">
             <el-option v-for="role in roles" :key="role.id" :label="role.name" :value="role.id"></el-option>
           </el-select>
         </div>
@@ -140,7 +140,7 @@ export default {
 
 <style scoped lang="scss">
 .page {
-  width: 30%;
+  width: 40%;
 }
 .wrapper {
   display: flex;
@@ -151,12 +151,14 @@ export default {
 .flex {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 15px;
   min-width: 40vh;
+  align-items: flex-start;
 }
 
 .w150 {
-  width: 150px;
+  width: 200px;
 }
 
 .button {

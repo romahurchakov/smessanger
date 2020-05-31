@@ -90,9 +90,5 @@ export default {
 </style>
 
 <style >
-.lol {
-    background-color: unset!important;
-    border-color: rgb(212, 212, 212)!important;
-    color: #bbc1c7!important;
-}
+
 </style>

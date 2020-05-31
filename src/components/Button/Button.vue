@@ -47,7 +47,7 @@
         font-weight: 700;
         transition: var(--hover-transition);
         &_primary {
-            color:var(--white);
+            color:var(--black);
             background: var(--primary);
             border-color: var(--primary);
 

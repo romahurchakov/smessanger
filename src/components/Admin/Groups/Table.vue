@@ -44,18 +44,17 @@
         <el-table-column
           prop="name"
           label="Название"
-          :filters="filter"
-          :filter-method="filterHandler"
+
         />
         <el-table-column prop="num" label="Численность" />
         <el-table-column width="50px">
           <template slot-scope="scope">
-            <i @click="isShowDeletePopup = true; id = scope.$index" class="el-icon-delete" />
+            <i @click="isShowDeletePopup = true; delete_row = scope.row" class="el-icon-delete" />
           </template>
         </el-table-column>
         <el-table-column width="50px">
           <template slot-scope="scope">
-            <i @click="updateGroup(tableData[scope.$index])" class="el-icon-edit" />
+            <i @click="updateGroup(scope.row)" class="el-icon-edit" />
             <el-dialog
               title="Хотите удалить группу"
               :visible.sync="isShowDeletePopup"
@@ -74,7 +73,7 @@
                   type="primary"
                   label="Да, удалить"
                   width="150"
-                  @click="deleteGroup(scope.$index)"
+                  @click="deleteGroup"
                 />
               </div>
             </el-dialog>
@@ -103,7 +102,8 @@ export default {
       id: -1,
       filter: [{ text: "asd", value: "asd" }],
       creating: {},
-      roles: []
+      roles: [],
+      delete_row: {},
     };
   },
   computed: {
@@ -126,9 +126,9 @@ export default {
         });
       }
     },
-    async deleteGroup(id) {
+    async deleteGroup() {
       try {
-        await this.DELETE_GROUP(this.tableData[id].id);
+        await this.DELETE_GROUP(this.delete_row.id);
         this.isShowDeletePopup = false;
         this.$emit('update-table')
       } catch (err) {
@@ -174,7 +174,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
 .task-input {
   width: 100%;
   max-width: 300px;

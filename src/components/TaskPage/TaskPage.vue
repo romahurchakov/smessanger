@@ -30,7 +30,7 @@
             <p v-if="readOnly">{{ taskData.thesisDate }}</p>
             <el-date-picker
               v-if="profile.role.teacher"
-              v-model="newTaskData.thesisDate"
+              v-model="newThesisDate"
               popper-class="date"
               :picker-options="datePickerOptions"
               class="calendar"
@@ -38,6 +38,7 @@
               format="d MMM yyyy г."
               type="date"
               placeholder="Выберите день"
+              @change="handleDatePicker"
             />
           </div>
         </div>
@@ -80,7 +81,7 @@
           <el-table-column prop="email" label="Почта" />
           <el-table-column width="50px">
             <template slot-scope="scope">
-              <i @click="isShowDeletePopup = true; id = scope.$index" class="el-icon-delete" />
+              <i @click="isShowDeletePopup = true; to_delete = scope.row" class="el-icon-delete" />
             </template>
           </el-table-column>
           <el-table-column width="50px">
@@ -97,13 +98,14 @@
                     label="Отменить"
                     width="150"
                     class="mr-24"
-                    @click="isShowDeletePopup = false"
+                    @click="isShowDeletePopup = false; lol = scope.$index"
                   />
                   <Button
+                    v-if="profile.role.teacher"
                     type="primary"
                     label="Да, удалить"
                     width="150"
-                    @click="readOnly? deleteUser(taskData.users[scope.$index].id): deleteUser(newTaskData.users[scope.$index].id)"
+                    @click="deleteUser"
                   />
                 </div>
               </el-dialog>
@@ -114,7 +116,7 @@
               <div
                 v-if="readOnly? taskData.users[scope.$index].completed && profile.role.teacher: false"
               >
-                <Button label="Скачать" type="info" @click="downloadReport(scope)">
+                <Button label="Скачать" type="info" class="down" @click="downloadReport(scope)">
                   <i src="@/assets/icons/download.svg" width="24" height="24" />
                 </Button>
               </div>
@@ -123,7 +125,7 @@
         </el-table>
       </div>
     </section>
-    <div v-if="profile.role.teacher && !createChat && readOnly">
+    <div v-if="profile.role.teacher && !taskData.already_exists && readOnly">
       <Button
         slot="trigger"
         type="info"
@@ -142,12 +144,7 @@
             class="mr-24"
             @click="showChatCreation = false"
           />
-          <Button
-            type="primary"
-            label="Да, создать"
-            width="150"
-            @click="create_chat"
-          />
+          <Button type="primary" label="Да, создать" width="150" @click="create_chat" />
         </div>
       </el-dialog>
     </div>
@@ -161,7 +158,7 @@
         with-credentials
         multiple
       >
-        <Button slot="trigger" type="info" label="Выбрать файл" width="170" />
+        <Button slot="trigger" type="info" label="Выбрать файл" class="down" width="170" />
       </el-upload>
       <Button
         v-if="profile.role.student"
@@ -218,6 +215,8 @@ export default {
       isShowDeletePopup: false,
       createChat: false,
       showChatCreation: false,
+      newThesisDate: "",
+      to_delete: {},
     };
   },
   computed: {
@@ -316,16 +315,16 @@ export default {
       });
       this.autocompleteValue = "";
     },
-    async deleteUser(id) {
+    async deleteUser() {
       if (!this.readOnly) {
         this.newTaskData.users = this.newTaskData.users.filter(
-          elem => elem.id != id
+          elem => elem.id != this.to_delete.id
         );
       } else {
         try {
-          await this.DELETE_USER({ id: this.taskData.id, user_id: id });
+          await this.DELETE_USER({ id: this.taskData.id, user_id: this.to_delete.id });
           this.taskData.users = this.taskData.users.filter(
-            elem => elem.id != id
+            elem => elem.id != this.to_delete.id
           );
         } catch (err) {
           this.$notify.error({
@@ -341,6 +340,7 @@ export default {
     },
     async createTask() {
       try {
+        this.newTaskData.thesisDate = this.newThesisDate
         await Promise.all([
           this.CREATE_TASK({ taskData: this.newTaskData, taskType: this.type })
         ]);
@@ -368,12 +368,40 @@ export default {
         });
       }
     },
+    async handleDatePicker() {
+      if (this.readOnly) {
+        try {
+          console.log(this.taskData.id)
+          var c = this.taskData
+          c.thesisDate = this.newThesisDate
+          const resp = await this.CHANGE_TASK({ taskData: c, id: this.taskData.id, taskType: this.type });
+          this.taskData.thesisDate = resp.thesis_date
+          this.newThesisDate = ""
+          console.log(this.taskData.id)
+        } catch (e) {
+          this.$notify.error({
+            title: "Ошибка!",
+            message: "Что-то пошло не так"
+          });
+        }
+      }
+    },
     submitFile() {
       console.log(this.UPLOAD(this.file));
     },
-    downloadReport() {
+    forceFileDownload(response) {
+      const url = window.URL.createObjectURL(
+        new Blob([response], { type: response.headers["content-type"] })
+      );
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "Your_file_name";
+      link.click();
+    },
+    async downloadReport() {
       try {
-        this.DOWNLOAD_REPORT({ id: this.taskData.id });
+        const resp = await this.DOWNLOAD_REPORT({ id: this.taskData.id });
+        this.forceFileDownload(resp);
       } catch (e) {
         this.$notify.error({
           title: "Ошибка!",
@@ -391,9 +419,13 @@ export default {
     },
     async create_chat() {
       try {
-        await this.CREATE_CHAT({name: this.taskData.name, users: this.taskData.users})
+        await this.CREATE_CHAT({
+          name: this.taskData.name,
+          users: this.taskData.users
+        });
         this.createChat = true;
-        this.showChatCreation = false
+        this.showChatCreation = false;
+        this.taskData.already_exists = true;
       } catch (e) {
         this.$notify.error({
           title: "Ошибка!",
@@ -441,6 +473,7 @@ export default {
 <style scoped lang="scss">
 .page {
   padding-top: 30px;
+  max-width: 750px;
 }
 .mgt {
   margin-top: 10px;
@@ -509,7 +542,7 @@ export default {
 }
 .actions {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
 }
 .flex {
@@ -524,6 +557,10 @@ export default {
 
 .mr20 {
   margin-right: 20px;
+}
+.down {
+  color: black;
+  background-color: var(--primary);
 }
 </style>
 

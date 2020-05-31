@@ -11,18 +11,7 @@
         </div>
 
         <el-dialog title="Регистрация пользователя" :visible.sync="isShowPopup">
-            <el-form :model="authForm">
-                <el-form-item label="Придумайте логин">
-                    <el-input v-model="authForm.login" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="Придумайте пароль">
-                    <el-input v-model="authForm.password" show-password autocomplete="off"></el-input>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="btn-footer">
-                <Button label="Отмена" type="reject" width="200" class="mr-24" @click="isShowPopup = false"/>
-                <Button label="Зарегистрироваться" width="200" type="primary" @click="isShowPopup = false"/>
-            </span>
+            <p> Обратитесь в службу поддержки для создания нового пользователя </p>
         </el-dialog>
     </main>
 </template>

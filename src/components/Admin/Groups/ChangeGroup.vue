@@ -1,5 +1,8 @@
 <template>
   <div class="page">
+    <div class="page-head mb-40">
+      <h1 class="title">{{ group.name }}</h1>
+    </div>
     <div>
       <div class="fl mb-24">
         <el-autocomplete
@@ -93,11 +96,11 @@
         <el-table-column prop="email" label="Почта" />
         <el-table-column width="50px">
           <template slot-scope="scope">
-            <i @click="isShowDeletePopup = true; id = scope.$index" class="el-icon-delete" />
+            <i @click="isShowDeletePopup = true; to_delete = scope.row" class="el-icon-delete" />
           </template>
         </el-table-column>
         <el-table-column width="50px">
-          <template slot-scope="scope">
+          <template>
             <el-dialog
               title="Хотите удалить задание"
               :visible.sync="isShowDeletePopup"
@@ -116,7 +119,7 @@
                   type="primary"
                   label="Да, удалить"
                   width="150"
-                  @click="deleteUser(group.users[scope.$index])"
+                  @click="deleteUser"
                 />
               </div>
             </el-dialog>
@@ -173,14 +176,15 @@ export default {
         });
       }
     },
-    async deleteUser(item) {
-      this.group.users = this.group.users.filter(elem => elem.id != item.id);
+    async deleteUser() {
       try {
+        this.group.users = this.group.users.filter(elem => elem.id != this.to_delete.id);
         const res = await this.UPDATE_GROUP({
           id: this.group.id,
           data: this.group
         });
         this.group = res;
+        this.isShowDeletePopup = false
       } catch (err) {
         this.$notify.error({
           title: "Ошибка!",
@@ -245,7 +249,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
 .page {
   width: 50%;
   padding-top: 40px;

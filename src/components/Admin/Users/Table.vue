@@ -12,7 +12,7 @@
         >
           <i class="el-icon-search el-input__icon" slot="suffix" />
           <template slot-scope="{ item }">
-            <div v-if="item.name">{{ item.name }}</div>
+            <div v-if="item.fio">{{ item.fio }}</div>
             <div v-else>Поиск не дал результатов</div>
           </template>
         </el-autocomplete>
@@ -68,10 +68,10 @@
         </el-dialog>
       </div>
       <el-table
-        :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"
+        :data="tableData.filter(data=> !autocompleteValue || !data.fio || data.fio.toLowerCase().includes(autocompleteValue.toLowerCase()))"
         empty-text="Нет данных"
       >
-        <el-table-column prop="fio" label="ФИО" :filters="filter" :filter-method="filterHandler" />
+        <el-table-column prop="fio" label="ФИО" />
         <el-table-column prop="login" label="Логин" />
         <el-table-column prop="faculty" label="Факультет" />
         <el-table-column prop="group" label="Группа" />
@@ -79,14 +79,18 @@
         <el-table-column prop="email" label="Почта" />
         <el-table-column width="50px">
           <template slot-scope="scope">
-            <i @click="isShowDeletePopup = true; id = scope.$index" class="el-icon-delete" />
+            <i
+              v-if="scope.row.login !== 'admin'"
+              @click="isShowDeletePopup = true; delete_row = scope.row"
+              class="el-icon-delete"
+            />
           </template>
         </el-table-column>
         <el-table-column width="50px">
           <template slot-scope="scope">
-            <i @click="updateUser(tableData[scope.$index])" class="el-icon-edit" />
+            <i @click="updateUser(scope.row)" class="el-icon-edit" />
             <el-dialog
-              title="Хотите удалить задание"
+              title="Хотите удалить пользователя"
               :visible.sync="isShowDeletePopup"
               width="550px"
             >
@@ -99,12 +103,7 @@
                   class="mr-24"
                   @click="isShowDeletePopup = false"
                 />
-                <Button
-                  type="primary"
-                  label="Да, удалить"
-                  width="150"
-                  @click="deleteUser(tableData[scope.$index])"
-                />
+                <Button type="primary" label="Да, удалить" width="150" @click="deleteUser" />
               </div>
             </el-dialog>
           </template>
@@ -132,7 +131,8 @@ export default {
       id: -1,
       filter: [{ text: "asd", value: "asd" }],
       creating: {},
-      roles: []
+      roles: [],
+      delete_row: {}
     };
   },
   computed: {
@@ -161,29 +161,26 @@ export default {
           group: this.creating.group,
           roles: [{ id: this.creating.role }]
         });
-        this.tableData.push({
-          fio: this.creating.fio,
-          login: this.creating.login,
-          password: this.creating.password,
-          phone: this.creating.phone,
-          email: this.creating.email,
-          faculty: "ИУ9",
-          group: this.creating.group,
-          roles: [{ id: this.creating.role }]
-        });
         this.creating = {};
         this.isShowCreatePopup = false;
+        this.$emit("update-table");
       } catch (e) {
-        console.log(e);
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
       }
     },
-    async deleteUser(row) {
+    async deleteUser() {
       try {
-        await this.DELETE_USER(row.id);
-        this.tableData = this.tableData.filter(elem => elem.id != row.id);
+        await this.DELETE_USER(this.delete_row.id);
         this.isShowDeletePopup = false;
+        this.$emit("update-table");
       } catch (e) {
-        console.log(e);
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
       }
     },
     updateUser(row) {
@@ -201,8 +198,8 @@ export default {
         const regex = new RegExp(".*" + this.autocompleteValue + ".*", "g");
         callback(
           this.tableData.filter(elem => {
-            if (!elem.name) return;
-            elem.name.match(regex);
+            if (!elem.fio) return;
+            elem.fio.match(regex);
           })
         );
       } catch (e) {
@@ -211,8 +208,8 @@ export default {
       }
     },
     handleSelect(item) {
-      this.autocompleteValue = item.name;
-      this.filter = [item.name];
+      this.autocompleteValue = item.fio;
+      this.filter = [item.fio];
     },
     filterHandler(value, row, column) {
       const property = column["property"];
@@ -233,7 +230,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
 .task-input {
   width: 100%;
   max-width: 300px;

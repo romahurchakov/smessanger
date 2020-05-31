@@ -1,5 +1,5 @@
 <template>
-  <main class="page">
+  <main class="page_kek">
     <div class="mb-40">
       <p class="text-style"></p>
     </div>
@@ -64,7 +64,10 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.page_kek {
+  max-width: 750px;
+}
 .tab-opener {
   animation: animate 0.7s ease-in-out;
 }

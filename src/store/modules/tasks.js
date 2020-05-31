@@ -35,7 +35,8 @@ const actions = {
                             issueDate: elem.created_at,
                             thesisDate: elem.thesis_date,
                             name: elem.name,
-                            users: data.users
+                            users: data.users,
+                            already_exists: data.already_exists,
                         }
                     } else {
                         return {
@@ -46,6 +47,7 @@ const actions = {
                             issueDate: elem.created_at,
                             thesisDate: elem.thesis_date,
                             name: elem.name,
+                            already_exists: data.already_exists,
                         }
                     }
                 })
@@ -54,8 +56,22 @@ const actions = {
                 errHandler(err)
             })
     },
-    CHANGE_TASK() {
-
+    CHANGE_TASK(_, { taskData, id, taskType}) {
+        let url = ''
+        switch (taskType) {
+            case 'labs':
+                url = `/api/labs/${id}`
+                break
+            case 'courses':
+                url = `/api/labs/${id}`
+                break
+        }
+        return apiClient.patch(url, {
+            thesisDate: taskData.thesisDate,
+        })
+            .then(({ data }) => {
+                return data
+            })
     },
     GET_TASK(_, { taskType, id }) {
         let url = ''
@@ -78,7 +94,8 @@ const actions = {
                         issueDate: data.created_at,
                         thesisDate: data.thesis_date,
                         name: data.name,
-                        users: data.users
+                        users: data.users,
+                        already_exists: data.already_exists,
                     }
                 } else {
                     return {
@@ -89,6 +106,7 @@ const actions = {
                         issueDate: data.created_at,
                         thesisDate: data.thesis_date,
                         name: data.name,
+                        already_exists: data.already_exists,
                     }
                 }
             })

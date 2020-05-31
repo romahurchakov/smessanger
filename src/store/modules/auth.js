@@ -49,7 +49,7 @@ const actions = {
                     user.state.profile.role.admin = resp.data.roles.find(isAdmin)
                     delete axios.defaults.headers.common["Authorization"]
                     localStorage.setItem('token', token)
-                    apiClient.defaults.headers.common['Authorization'] = token
+                    axios.defaults.headers.common['Authorization'] = token
                     commit('auth_success', token, user1)
                     resolve(resp)
                 })

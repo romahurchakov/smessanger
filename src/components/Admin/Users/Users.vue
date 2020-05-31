@@ -1,17 +1,17 @@
 <template>
-  <main class="page">
+  <main class="page_kek">
     <div class="mb-40">
       <p class="text-style"></p>
     </div>
     <article>
-      <Table :tableData="tableData"/>
+      <Table :tableData="tableData" @update-table="updateTable" />
     </article>
   </main>
 </template>
 
 <script>
 import { mapActions } from "vuex";
-import Table from "./Table.vue"
+import Table from "./Table.vue";
 export default {
   components: {
     Table
@@ -23,7 +23,18 @@ export default {
   },
   methods: {
     ...mapActions("user", ["GET_USERS", "GET_ROLES"]),
-    onTabClickandler() {}
+    onTabClickandler() {},
+    async updateTable() {
+      try {
+        const users = await this.GET_USERS();
+        this.tableData = users;
+      } catch (err) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: err.message
+        });
+      }
+    }
   },
   async mounted() {
     try {
@@ -39,7 +50,10 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.page_kek {
+  max-width: 750px;
+}
 .tab-opener {
   animation: animate 0.7s ease-in-out;
 }

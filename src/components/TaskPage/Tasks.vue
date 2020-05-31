@@ -77,7 +77,10 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+    .page {
+        max-width: 750px;
+    }
     .tab-opener {
         animation: animate .7s ease-in-out;
     }

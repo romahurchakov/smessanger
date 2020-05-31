@@ -20,7 +20,7 @@
           {{ item.label }}
         </div>
       </el-menu-item>
-      <el-submenu index="1" :v-show="isAdmin">
+      <el-submenu index="1" v-if="isAdmin">
         <template slot="title">
           <i class="el-icon-s-tools"></i>
           <span>Панель администратора</span>
@@ -50,7 +50,7 @@ export default {
       return this.$route.name;
     },
     isAdmin() {
-      return store.getters["user/isAdmin"];
+      return !!store.getters["user/isAdmin"];
     }
   },
   data() {

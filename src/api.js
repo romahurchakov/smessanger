@@ -29,3 +29,9 @@ axios.interceptors.response.use(
         return Promise.reject(err.response);
     }
 );
+
+apiClient.interceptors.request.use(config => {
+    config.headers.Authorization = localStorage.getItem('token');
+    return config;
+}
+);

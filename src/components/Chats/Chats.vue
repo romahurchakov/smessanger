@@ -20,7 +20,7 @@
                 class="chats__list__list__element__header__leal"
                 v-if="chat.messages.length > 0"
               >{{ chat.messages[0].created_at}}</p>
-              <i class="el-icon-delete" @click.stop="show = true" />
+              <i class="el-icon-delete" @click.stop="show = true; to_delete = chats[index]" />
               <el-dialog title="Хотите удалить чат" :visible.sync="show" width="550px">
                 <p>Вы уверены, что хотите удалить чат?</p>
                 <div slot="footer" class="btn-footer">
@@ -31,12 +31,7 @@
                     class="mr-24"
                     @click="show = false"
                   />
-                  <Button
-                    type="primary"
-                    label="Да, удалить"
-                    width="150"
-                    @click="deleteChat(chats[index].id)"
-                  />
+                  <Button type="primary" label="Да, удалить" width="150" @click="deleteChat" />
                 </div>
               </el-dialog>
             </div>
@@ -70,7 +65,8 @@ export default {
       chats: [],
       active: false,
       show: false,
-      showCreating: false
+      showCreating: false,
+      to_delete: {}
     };
   },
   computed: {
@@ -90,11 +86,12 @@ export default {
       }
       this.chats[j].messages = [msg];
     },
-    async deleteChat(id) {
+    async deleteChat() {
       try {
-        console.log(id);
-        //await this.DELETE_CHAT(id);
+        await this.DELETE_CHAT(this.to_delete.id);
         this.show = false;
+        const resp = await this.GET_CHATS();
+        this.chats = resp.chats;
       } catch (e) {
         this.$notify.error({
           title: "Ошибка!",
@@ -131,6 +128,8 @@ export default {
 <style lang="scss" scoped>
 .chat_page {
   height: 100%;
+  justify-self: center;
+  max-width: 750px;
 }
 .chats {
   display: flex;

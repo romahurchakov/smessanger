@@ -16,7 +16,7 @@
                 <Button type="primary" :label="createBtnLabel" width="300" @click="createTask"  v-if="profile.role.teacher"/>
             </div>
             <el-table :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"  @row-click="onTableClickHandler" empty-text="Нет данных">
-                <el-table-column prop="name" label="Название" :filters=filter :filter-method="filterHandler"/>
+                <el-table-column prop="name" label="Название"/>
                 <el-table-column prop="discipline" label="Дисциплина"/>
                 <el-table-column prop="thesisDate" label="Дедлайн"/>
                 <el-table-column v-if="profile.role.teacher" width="150px">
@@ -146,7 +146,7 @@
     }
 </script>
 
-<style>
+<style lang="scss" scoped>
     .article {
         background: var(--white);
         padding: 24px;
