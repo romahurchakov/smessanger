@@ -52,7 +52,7 @@ export default {
 
 <style lang="scss" scoped>
 .page_kek {
-  max-width: 750px;
+  width: 80%;
 }
 .tab-opener {
   animation: animate 0.7s ease-in-out;

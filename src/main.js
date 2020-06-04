@@ -6,10 +6,11 @@ import router from './router';
 import './assets/styles/element-variables.scss';
 import './index.css';
 import store from './store/store'
+import vuePdf from 'vue-pdf'
 
 Vue.config.productionTip = false
 Vue.use(Element, { locale });
-
+Vue.component(vuePdf)
 new Vue({
   router,
   store,

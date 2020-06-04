@@ -3,13 +3,17 @@
     <Header />
     <div class="view">
       <div v-if="!isAuth">
-        <router-view></router-view>
+        <div class="right">
+          <router-view></router-view>
+        </div>
       </div>
       <div v-else class="flex">
         <div class="left">
           <SideBar />
         </div>
-        <router-view></router-view>
+        <div class="right">
+          <router-view></router-view>
+        </div>
       </div>
     </div>
     <Footer />
@@ -48,11 +52,14 @@ export default {
 
 .flex {
   display: flex;
-  justify-content: center;
 }
 
 .left {
-  position: absolute;
-  left: 0;
+}
+
+.right {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 </style>

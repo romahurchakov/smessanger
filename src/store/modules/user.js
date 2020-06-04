@@ -7,6 +7,7 @@ const state = {
             teacher: false,
             student: false,
             admin: false,
+            news: false,
         },
         name: null
     },
@@ -20,7 +21,8 @@ const state = {
 const getters = {
     i: state => !state.profile.name || !state.login,
     name: state => state.profile.name,
-    isAdmin: state => state.profile.role.admin
+    isAdmin: state => state.profile.role.admin,
+    isNewsEditor: state => state.profile.role.news,
 };
 
 const isTeacher = function (element) {
@@ -39,6 +41,13 @@ const isStudent = function (element) {
 
 const isAdmin = function (element) {
     if (element.name == 'admin') {
+        return true
+    }
+    return false
+}
+
+const isNewsEditor = function (element) {
+    if (element.name == 'news') {
         return true
     }
     return false
@@ -154,6 +163,7 @@ const mutations = {
         state.profile.role.teacher = data.roles.find(isTeacher)
         state.profile.role.student = data.roles.find(isStudent)
         state.profile.role.admin = data.roles.find(isAdmin)
+        state.profile.role.news = data.roles.find(isNewsEditor)
     }
 };
 

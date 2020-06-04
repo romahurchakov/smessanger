@@ -36,7 +36,7 @@
 <style scoped lang="scss">
     .button {
         width: 100%;
-        height: 44px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -76,7 +76,6 @@
             color: var(--white);
             &:hover {
                 border-color: var(--cucumber-hover);
-                background: var(--cucumber-hover);
                 transition: var(--hover-transition);
             }
         }

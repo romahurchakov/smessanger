@@ -115,7 +115,43 @@ const router = new Router({
                 requiresAuth: true,
             },
             component: () => import(/* webpackChunkName: "task" */ './components/Chats/CreateChat')
-        }
+        },
+        {
+            path: '/news/management',
+            name: 'news',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/News/News')
+        },
+        {
+            path: '/news/create',
+            name: 'news-create',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/News/CreateNews')
+        },
+        {
+            path: '/news',
+            name: 'news-page',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/News/MainPage')
+        },
+        {
+            path: '/admin/groups/:id/transfer',
+            name: 'group-transfer',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Admin/Groups/Transfer')
+        },
     ]
 });
 

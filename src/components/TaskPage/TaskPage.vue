@@ -216,7 +216,7 @@ export default {
       createChat: false,
       showChatCreation: false,
       newThesisDate: "",
-      to_delete: {},
+      to_delete: {}
     };
   },
   computed: {
@@ -322,7 +322,10 @@ export default {
         );
       } else {
         try {
-          await this.DELETE_USER({ id: this.taskData.id, user_id: this.to_delete.id });
+          await this.DELETE_USER({
+            id: this.taskData.id,
+            user_id: this.to_delete.id
+          });
           this.taskData.users = this.taskData.users.filter(
             elem => elem.id != this.to_delete.id
           );
@@ -340,7 +343,7 @@ export default {
     },
     async createTask() {
       try {
-        this.newTaskData.thesisDate = this.newThesisDate
+        this.newTaskData.thesisDate = this.newThesisDate;
         await Promise.all([
           this.CREATE_TASK({ taskData: this.newTaskData, taskType: this.type })
         ]);
@@ -371,13 +374,17 @@ export default {
     async handleDatePicker() {
       if (this.readOnly) {
         try {
-          console.log(this.taskData.id)
-          var c = this.taskData
-          c.thesisDate = this.newThesisDate
-          const resp = await this.CHANGE_TASK({ taskData: c, id: this.taskData.id, taskType: this.type });
-          this.taskData.thesisDate = resp.thesis_date
-          this.newThesisDate = ""
-          console.log(this.taskData.id)
+          console.log(this.taskData.id);
+          var c = this.taskData;
+          c.thesisDate = this.newThesisDate;
+          const resp = await this.CHANGE_TASK({
+            taskData: c,
+            id: this.taskData.id,
+            taskType: this.type
+          });
+          this.taskData.thesisDate = resp.thesis_date;
+          this.newThesisDate = "";
+          console.log(this.taskData.id);
         } catch (e) {
           this.$notify.error({
             title: "Ошибка!",
@@ -473,7 +480,7 @@ export default {
 <style scoped lang="scss">
 .page {
   padding-top: 30px;
-  max-width: 750px;
+  width: 80%;
 }
 .mgt {
   margin-top: 10px;

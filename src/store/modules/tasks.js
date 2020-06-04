@@ -171,6 +171,7 @@ const actions = {
             })
     },
     DOWNLOAD_REPORT(_, { id }) {
+        //window.open(`http://localhost:8888/api/labs/${id}/report`, '_blank');
         let url = `/api/labs/${id}/report`
         return apiClient.get(url)
             .then(({ data }) => {

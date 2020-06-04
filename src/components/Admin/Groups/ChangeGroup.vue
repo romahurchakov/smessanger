@@ -2,6 +2,7 @@
   <div class="page">
     <div class="page-head mb-40">
       <h1 class="title">{{ group.name }}</h1>
+      <el-tag type="success" v-if="group.is_study" style="margin-left: 35px;">Учебная</el-tag>
     </div>
     <div>
       <div class="fl mb-24">
@@ -10,7 +11,7 @@
           v-model="autocompleteValue"
           :trigger-on-focus="false"
           :fetch-suggestions="querySearch"
-          placeholder="Начните вводить"
+          placeholder="Поиск студентов"
           @select="handleSelect"
         >
           <i class="el-icon-search el-input__icon" slot="suffix" />
@@ -20,7 +21,7 @@
           </template>
         </el-autocomplete>
         <Button
-          type="primary"
+          type="simple"
           :label="createBtnLabel"
           width="300"
           @click="isShowCreatePopup = true"
@@ -74,13 +75,13 @@
           </div>
           <div slot="footer" class="btn-footer">
             <Button
-              type="reject"
+              type="simple"
               label="Отменить"
               width="150"
               class="mr-24"
               @click="isShowCreatePopup = false"
             />
-            <Button type="primary" label="Добавить" width="150" @click="addUser" />
+            <Button type="simple" label="Добавить" width="150" @click="addUser" />
           </div>
         </el-dialog>
       </div>
@@ -253,6 +254,9 @@ export default {
 .page {
   width: 50%;
   padding-top: 40px;
+}
+.page-head {
+  display: flex;
 }
 .task-input {
   width: 100%;

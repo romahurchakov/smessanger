@@ -38,6 +38,16 @@
           </div>
         </el-menu-item>
       </el-submenu>
+      <el-menu-item
+        v-if="!isNewsEditor"
+        index="news"
+        :route="{ name: 'news'}"
+        >
+          <div>
+            <i class="el-icon-news"></i>
+            Управление новостями
+          </div>
+        </el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -51,6 +61,9 @@ export default {
     },
     isAdmin() {
       return !!store.getters["user/isAdmin"];
+    },
+    isNewsEditor() {
+      return !!store.getters["user/isNewsEditor"]
     }
   },
   data() {

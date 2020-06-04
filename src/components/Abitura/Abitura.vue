@@ -85,19 +85,18 @@ export default {
 
 <style scoped lang="scss">
 .wrapper {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .profile {
-  max-width: 700px;
+  max-width: 70vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 10px;
-  margin-left: 10%;
-  margin-right: 10%;
 
   .dt {
     font-weight: 700;

@@ -7,7 +7,7 @@
           v-model="autocompleteValue"
           :trigger-on-focus="false"
           :fetch-suggestions="querySearch"
-          placeholder="Начните вводить"
+          placeholder="Поиск по названию"
           @select="handleSelect"
         >
           <i class="el-icon-search el-input__icon" slot="suffix" />
@@ -17,7 +17,7 @@
           </template>
         </el-autocomplete>
         <Button
-          type="primary"
+          type="simple"
           :label="createBtnLabel"
           width="300"
           @click="isShowCreatePopup = true"
@@ -25,15 +25,16 @@
         <el-dialog title="Создание группы" :visible.sync="isShowCreatePopup">
           <p class="hint-text mb-8">Название группы</p>
           <el-input placeholder="Название" v-model="creating.name" />
+          <el-switch v-model="creating.is_study" active-text="Учебная" style="margin-top:30px;"></el-switch>
           <div slot="footer" class="btn-footer">
             <Button
-              type="reject"
+              type="simple"
               label="Отменить"
               width="150"
               class="mr-24"
               @click="isShowCreatePopup = false"
             />
-            <Button type="primary" label="Создать" width="150" @click="createGroup" />
+            <Button type="simple" label="Создать" width="150" @click="createGroup" />
           </div>
         </el-dialog>
       </div>
@@ -41,15 +42,20 @@
         :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"
         empty-text="Нет данных"
       >
-        <el-table-column
-          prop="name"
-          label="Название"
-
-        />
+        <el-table-column width="100px">
+          <template slot-scope="scope">
+            <el-tag type="success" v-if="scope.row.is_study">Учебная</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="name" label="Название" />
         <el-table-column prop="num" label="Численность" />
         <el-table-column width="50px">
           <template slot-scope="scope">
-            <i @click="isShowDeletePopup = true; delete_row = scope.row" class="el-icon-delete" />
+            <i
+              @click="isShowDeletePopup = true; delete_row = scope.row"
+              v-if="!scope.row.is_study"
+              class="el-icon-delete"
+            />
           </template>
         </el-table-column>
         <el-table-column width="50px">
@@ -69,14 +75,19 @@
                   class="mr-24"
                   @click="isShowDeletePopup = false"
                 />
-                <Button
-                  type="primary"
-                  label="Да, удалить"
-                  width="150"
-                  @click="deleteGroup"
-                />
+                <Button type="primary" label="Да, удалить" width="150" @click="deleteGroup" />
               </div>
             </el-dialog>
+          </template>
+        </el-table-column>
+        <el-table-column width="50px">
+          <template slot-scope="scope">
+            <i
+            title="Перевести учебную группу"
+              v-if="scope.row.is_study"
+              @click="transferGroup(scope.row)"
+              class="el-icon-sunrise-1"
+            />
           </template>
         </el-table-column>
       </el-table>
@@ -103,7 +114,7 @@ export default {
       filter: [{ text: "asd", value: "asd" }],
       creating: {},
       roles: [],
-      delete_row: {},
+      delete_row: {}
     };
   },
   computed: {
@@ -118,7 +129,7 @@ export default {
         await this.CREATE_GROUP(this.creating);
         this.isShowCreatePopup = false;
         this.creating = {};
-        this.$emit('update-table')
+        this.$emit("update-table");
       } catch (err) {
         this.$notify.error({
           title: "Ошибка!",
@@ -130,7 +141,7 @@ export default {
       try {
         await this.DELETE_GROUP(this.delete_row.id);
         this.isShowDeletePopup = false;
-        this.$emit('update-table')
+        this.$emit("update-table");
       } catch (err) {
         this.$notify.error({
           title: "Ошибка!",
@@ -141,6 +152,14 @@ export default {
     updateGroup(row) {
       this.$router.push({
         name: "change-group",
+        params: {
+          id: row.id
+        }
+      });
+    },
+    transferGroup(row) {
+      this.$router.push({
+        name: "group-transfer",
         params: {
           id: row.id
         }

@@ -9,9 +9,6 @@
                 <el-tab-pane label="Лабы" name="labs" class="tab-opener">
                     <TaskTable :tableData="tableDataLabs" type="labs" :deleteTask="deleteTask"/>
                 </el-tab-pane>
-                <el-tab-pane label="Курсовые" name="courses" class="tab-opener" :disabled="true">
-                    <TaskTable :tableData="tableDataCourses" type="courses" :deleteTask="deleteTask"/>
-                </el-tab-pane>
             </el-tabs>
         </article>
     </main>
@@ -79,7 +76,7 @@
 
 <style lang="scss" scoped>
     .page {
-        max-width: 750px;
+        width: 80%;
     }
     .tab-opener {
         animation: animate .7s ease-in-out;
