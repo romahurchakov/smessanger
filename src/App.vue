@@ -55,6 +55,8 @@ export default {
 }
 
 .left {
+  width: 319px;
+  min-width: 319px;
 }
 
 .right {

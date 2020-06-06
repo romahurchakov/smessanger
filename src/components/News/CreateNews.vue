@@ -112,7 +112,7 @@ export default {
           data: {
             title: this.title,
             image_bytes: this.image_bytes,
-            body: this.body,
+            body: this.body.replace(/(\r\n|\n|\r)/gm, '<br />'),
             category: this.category,
             doc_name: this.doc_name
           }

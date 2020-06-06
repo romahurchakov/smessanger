@@ -30,7 +30,7 @@
             <img
               v-if="elem.image_bytes"
               style="width:100%;"
-              :src="'data:image/jpeg;base64,'+elem.image_bytes"
+              :src="elem.image_bytes"
             />
           </div>
           <div v-if="elem.doc_id" class="news_page__card__internal__doc">

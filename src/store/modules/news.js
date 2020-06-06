@@ -28,8 +28,9 @@ const actions = {
         //window.open(`http://localhost:8888/api/labs/${id}/report`, '_blank');
         let url = `/api/news/docs/${name}`
         return apiClient.get(url)
-            .then(({ data }) => {
-                return data
+            .then(res => {
+                return {
+                    data: res.data, filename: res.headers['content-disposition'].split("filename=")[1]}
             })
     },
 };

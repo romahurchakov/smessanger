@@ -86,7 +86,7 @@
             title="Перевести учебную группу"
               v-if="scope.row.is_study"
               @click="transferGroup(scope.row)"
-              class="el-icon-sunrise-1"
+              class="el-icon-truck"
             />
           </template>
         </el-table-column>

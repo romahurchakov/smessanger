@@ -159,17 +159,17 @@ export default {
         );
       }
     },
-    forceFileDownload(response) {
-      const url = window.URL.createObjectURL(new Blob([response]));
+    forceFileDownload(response, filename) {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.download = "Your_file_name.jpeg";
+      link.download = filename;
       link.click();
     },
     async downloadFile(elem) {
       try {
         const resp = await this.DOWNLOAD_REPORT({name: elem.doc_name});
-        this.forceFileDownload(resp);
+        this.forceFileDownload(resp, elem.doc_name);
       } catch (e) {
         this.$notify.error({
           title: "Ошибка!",
