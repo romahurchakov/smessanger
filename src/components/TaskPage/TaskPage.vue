@@ -1,238 +1,278 @@
 <template>
   <main class="page">
-    <div class="page-head mb-40">
+    <div class="page-head">
       <h1 class="title">{{ pageTitle }}</h1>
       <div class="page-head-div">
         <div class="task-type">{{ taskType }}</div>
       </div>
     </div>
-    <section class="task mb-40">
-      <div class="task__info mb-24">
-        <div class="flex">
-          <div class="task__input rigt-auto" v-if="!readOnly">
-            <p class="hint-text mb-8">Введите название задания</p>
-            <el-input placeholder="Введите название" v-model="newTaskData.title" />
+    <div style="padding: 10px;">
+      <div class="points">
+        <div v-for="point in taskData.points" :key="point.description">
+          <p>{{ point.name }}. {{ point.description }}</p>
+          <div style="padding-left: 15px; padding-top: 10px; padding-bottom: 10px;">
+            <div v-for="v in point.vars" :key="v.name" style="margin-top: 3px;">
+              <p>{{ v.name }}. {{ v.description }}</p>
+            </div>
           </div>
-          <div class="mr20">
-            <p class="hint-text mb-8">Дисциплина</p>
-            <p v-if="readOnly">{{ taskData.discipline }}</p>
-            <el-select v-else v-model="newTaskData.discipline" placeholder="Укажите вашу роль">
-              <el-option
-                v-for="discipline in disciplines"
-                :key="discipline.id"
-                :label="discipline.name"
-                :value="discipline.name"
-              ></el-option>
-            </el-select>
-          </div>
-          <div class="task__input">
-            <p class="hint-text mb-8">Крайний срок сдачи</p>
-            <p v-if="readOnly">{{ taskData.thesisDate }}</p>
-            <el-date-picker
-              v-if="profile.role.teacher"
-              v-model="newThesisDate"
-              popper-class="date"
-              :picker-options="datePickerOptions"
-              class="calendar"
-              value-format="yyyy.MM.dd"
-              format="d MMM yyyy г."
-              type="date"
-              placeholder="Выберите день"
-              @change="handleDatePicker"
-            />
-          </div>
-        </div>
-        <div class="mb-24">
-          <p class="hint-text mb-8 mgt">Описание задания</p>
-          <p v-if="readOnly" class="text-style">{{ taskData.description || '-' }}</p>
-          <textarea v-else v-model="newTaskData.description" class="task__desc" />
-        </div>
-        <div class="task__input mgt" v-if="!readOnly">
-          <p class="hint-text mb-8">Поиск студента по ФИО</p>
-          <p v-if="readOnly">{{ taskData.fio }}</p>
-          <el-autocomplete
-            v-else
-            class="task__input autocomplete"
-            v-model="autocompleteValue"
-            :trigger-on-focus="false"
-            :fetch-suggestions="querySearch"
-            placeholder="Введите ФИО"
-            @select="handleSelect"
-          >
-            <i class="el-icon-search el-input__icon" slot="suffix" />
-            <template slot-scope="{ item }">
-              <div v-if="item.fio">{{ item.fio }}</div>
-              <div v-else>Поиск не дал результатов</div>
-            </template>
-          </el-autocomplete>
         </div>
       </div>
-      <div class="task__info">
+    </div>
+    <p v-if="isTeacher" style="font-weight: bold;">Варианты:</p>
+    <p v-else style="font-weight: bold;">Вариант:</p>
+    <div style="padding: 10px;">
+      <div class="points">
         <el-table
-          :data="readOnly ? taskData.users : newTaskData.users"
-          empty-text="Нет данных"
-          :row-class-name="tableRowClassName"
+          :data="taskData.variants"
+          :default-sort="{prop: 'number', order: 'ascending'}"
+          style="width: 100%"
+          border
         >
-          <el-table-column prop="fio" label="ФИО" />
-          <el-table-column prop="login" label="Логин" />
-          <el-table-column prop="faculty" label="Факультет" />
-          <el-table-column prop="group" label="Группа" />
-          <el-table-column prop="phone" label="Телефон" />
-          <el-table-column prop="email" label="Почта" />
-          <el-table-column width="50px">
-            <template slot-scope="scope">
-              <i @click="isShowDeletePopup = true; to_delete = scope.row" class="el-icon-delete" />
-            </template>
-          </el-table-column>
-          <el-table-column width="50px">
-            <template slot-scope="scope">
-              <el-dialog
-                title="Хотите удалить задание"
-                :visible.sync="isShowDeletePopup"
-                width="550px"
-              >
-                <p>Вы уверены, что хотите удалить пользователя?</p>
-                <div slot="footer" class="btn-footer">
-                  <Button
-                    type="reject"
-                    label="Отменить"
-                    width="150"
-                    class="mr-24"
-                    @click="isShowDeletePopup = false; lol = scope.$index"
-                  />
-                  <Button
-                    v-if="profile.role.teacher"
-                    type="primary"
-                    label="Да, удалить"
-                    width="150"
-                    @click="deleteUser"
-                  />
-                </div>
-              </el-dialog>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="readOnly">
-            <template slot-scope="scope">
-              <div
-                v-if="readOnly? taskData.users[scope.$index].completed && profile.role.teacher: false"
-              >
-                <Button label="Скачать" type="info" class="down" @click="downloadReport(scope)">
-                  <i src="@/assets/icons/download.svg" width="24" height="24" />
-                </Button>
-              </div>
-            </template>
-          </el-table-column>
+          <el-table-column prop="number" label="Номер" width="100px"></el-table-column>
+          <el-table-column v-for="p in taskData.params" :key="p" :label="p" :prop="p"></el-table-column>
+          <!-- <el-table-column width="40px"> <i class="el-icon-info" /></el-table-column> -->
         </el-table>
       </div>
-    </section>
-    <div v-if="profile.role.teacher && !taskData.already_exists && readOnly">
-      <Button
-        slot="trigger"
-        type="info"
-        label="Создать чат"
-        width="170"
-        style="margin-left: auto; color: black;"
-        @click="showChatCreation = true"
-      />
-      <el-dialog title="Создание чата" :visible.sync="showChatCreation" width="550px">
-        <p>Создать чат со всеми студентами, на которых назначена работа ?</p>
-        <div slot="footer" class="btn-footer">
-          <Button
-            type="reject"
-            label="Отменить"
-            width="150"
-            class="mr-24"
-            @click="showChatCreation = false"
-          />
-          <Button type="primary" label="Да, создать" width="150" @click="create_chat" />
-        </div>
-      </el-dialog>
-    </div>
-    <div class="actions">
-      <el-upload
-        v-if="profile.role.student"
-        class="upload-demo mr-24"
-        ref="upload"
-        :http-request="addAttachment"
-        :auto-upload="false"
-        with-credentials
-        multiple
+      <div style="display:flex; margin-top:10px; justify-content:flex-end;" v-if="isTeacher">
+        <Button
+          type="simple"
+          label="Добавить пользователя"
+          width="200"
+          style="height:30px;"
+          @click="isShowCreatePopup = true"
+        />
+        <Button
+          type="simple"
+          label="Добавить группу"
+          width="200"
+          style="margin-left: 20px; height:30px;"
+          @click="isShowAddGroupPopup = true"
+        />
+      </div>
+      <el-table
+        :data="taskData.users"
+        :default-sort="{prop: 'fio', order: 'ascending'}"
+        style="width: 100%"
+        v-if="isTeacher"
       >
-        <Button slot="trigger" type="info" label="Выбрать файл" class="down" width="170" />
-      </el-upload>
+        <el-table-column type="index" width="50"></el-table-column>
+        <el-table-column prop="fio" label="ФИО"></el-table-column>
+        <el-table-column label="Вариант" fixed="right" width="250px">
+          <template slot-scope="scope">
+            <el-select
+              v-model="scope.row.variant.number"
+              placeholder="Выберите"
+              @change="value => selectVariant(value, scope.row)"
+              style="margin-top: 15px;"
+            >
+              <el-option
+                v-for="v in taskData.variants"
+                :key="v.id"
+                :label="v.number"
+                :value="v.number"
+              ></el-option>
+            </el-select>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" width="100px">
+          <template slot-scope="scope">
+            <i
+              @click="deleteUser(scope.row)"
+              class="el-icon-delete"
+              style="margin-left:50%; margin-top:10px;"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" width="100px">
+          <i class="el-icon-chat-line-round" style="margin-left:50%; margin-top:10px;" />
+        </el-table-column>
+        <el-table-column fixed="right" width="150px">
+          <template slot-scope="scope">
+            <Button
+              type="custom"
+              label="Скачать отчет"
+              width="200px"
+              @click="downloadReport(scope.row)"
+              style="height:30px; margin-top:5px;"
+              v-if="scope.row.completed"
+            />
+          </template>
+        </el-table-column>
+      </el-table>
       <Button
-        v-if="profile.role.student"
-        type="primary"
-        label="Отправить файл(ы)"
-        class="mr-24"
-        width="170"
-        @click="uploadFile"
+        type="simple"
+        label="Подтвердить"
+        width="150"
+        @click="submit"
+        style="height:30px; margin-top: 15px; margin-left:auto;"
+        v-if="isTeacher"
       />
-      <Button
-        v-if="profile.role.teacher && !readOnly "
-        type="primary"
-        label="Создать"
-        width="200"
-        @click="createTask"
-      ></Button>
+      <div v-else style="margin-left: -10px;">
+        <h4 style="margin-top: 30px;">Отчет</h4>
+        <div style="display:flex;">
+          <el-upload
+            class="upload-demo mr-24"
+            :limit="1"
+            :on-exceed="handleExceed"
+            :auto-upload="false"
+            :on-change="handleSuccessFile"
+            :on-remove="handleRemove"
+            action
+          >
+            <Button
+              slot="trigger"
+              type="simple"
+              label="Выбрать"
+              class="down"
+              width="150"
+              style="margin-top:15px;"
+            />
+          </el-upload>
+          <Button
+            slot="trigger"
+            type="simple"
+            label="Отправить"
+            class="down"
+            width="150"
+            @click="upload"
+            style="margin-left:15px;margin-top:15px;"
+          />
+        </div>
+      </div>
     </div>
-    <template></template>
+    <el-dialog title="Добавление пользователя" :visible.sync="isShowCreatePopup">
+      <el-autocomplete
+        class="task__input autocomplete"
+        v-model="autocompleteValue"
+        :trigger-on-focus="false"
+        :fetch-suggestions="findUsers"
+        placeholder="Введите ФИО"
+        @select="handleSearch"
+      >
+        <i class="el-icon-search el-input__icon" slot="suffix" />
+        <template slot-scope="{ item }">
+          <div v-if="item.fio">{{ item.fio }}</div>
+          <div v-else>Поиск не дал результатов</div>
+        </template>
+      </el-autocomplete>
+      <div v-if="popupUser" class="popup_user">
+        <div v-if="popupUser">
+          <div class="mb-24">
+            <p class="hint-text mb-8">ФИО</p>
+            <p class="text-style">{{ popupUser.fio || '-'}}</p>
+          </div>
+          <div class="mb-24">
+            <p class="hint-text mb-8">Логин</p>
+            <p class="text-style">{{ popupUser.login || '-'}}</p>
+          </div>
+        </div>
+        <div v-if="popupUser">
+          <div class="mb-24">
+            <p class="hint-text mb-8">Группа</p>
+            <p class="text-style">{{ popupUser.group || '-'}}</p>
+          </div>
+        </div>
+        <div v-if="popupUser">
+          <div class="mb-24">
+            <p class="hint-text mb-8">Телефон</p>
+            <p class="text-style">{{ popupUser.phone || '-'}}</p>
+          </div>
+          <div class="mb-24">
+            <p class="hint-text mb-8">Почта</p>
+            <p class="text-style">{{ popupUser.email || '-'}}</p>
+          </div>
+        </div>
+      </div>
+      <div slot="footer" class="btn-footer">
+        <Button
+          type="simple"
+          label="Отменить"
+          width="150"
+          class="mr-24"
+          @click="isShowCreatePopup = false"
+        />
+        <Button type="simple" label="Добавить" width="150" @click="addUser" />
+      </div>
+    </el-dialog>
+
+    <el-dialog title="Добавление группы" :visible.sync="isShowAddGroupPopup" width="750px">
+      <div style="display:flex;">
+        <div>
+          <p style="font-weight: bold;">Выберите группу:</p>
+          <el-select
+            v-model="popupGroup.name"
+            filterable
+            placeholder="Выберите группу"
+            @change="selectGroup"
+            style="margin-top: 15px;"
+          >
+            <el-option
+              v-for="g in otherGroups"
+              :key="g.id"
+              :label="g.name + ' (' + g.users.length + ')' "
+              :value="g.name"
+            ></el-option>
+          </el-select>
+        </div>
+        <div style="margin-left: 100px;">
+          <p style="font-weight: bold;">Список пользователей:</p>
+          <div v-for="(user, index) in popupGroup.users" :key="user.id" class="user_row">
+            <p>{{ index+1 }}.</p>
+            <p style="margin-left:10px;">{{ user.fio }}</p>
+          </div>
+        </div>
+      </div>
+      <div slot="footer" class="btn-footer">
+        <Button
+          type="simple"
+          label="Отменить"
+          width="150"
+          class="mr-24"
+          @click="isShowAddGroupPopup = false"
+        />
+        <Button type="simple" label="Добавить" width="150" @click="addGroup" />
+      </div>
+    </el-dialog>
   </main>
 </template>
 
 <script>
-import Button from "@/components/ui/Button/Button";
 import { mapState, mapActions } from "vuex";
+import Button from "@/components/ui/Button/Button";
+import store from "@/store/store";
+
 export default {
   components: {
     Button
   },
   data() {
     return {
-      file: "",
+      taskData: { users: [] },
+      type: "labs",
+      isShowCreatePopup: false,
+      isShowAddGroupPopup: false,
       autocompleteValue: "",
-      datePickerOptions: {
-        disabledDate(date) {
-          return date < new Date().setDate(new Date().getDate() - 1);
-        }
-      },
-      newTaskData: {
-        users: [],
-        id: null,
-        name: "",
-        discipline: "Выберите дисциплину",
-        description: "",
-        issueDate: "",
-        thesisDate: "",
-        completed: false
-      },
-      readOnly: null,
-      type: "", // если не readOnly - получаем type из params роутера
-      taskData: {
-        users: []
-      }, // если не readOnly - получаем taskData из params роутера
-      disciplines: [],
-      isShowDeletePopup: false,
-      createChat: false,
-      showChatCreation: false,
-      newThesisDate: "",
-      to_delete: {}
+      popupUser: {},
+      popupGroup: {},
+      otherGroups: [],
+      users: [],
+      doc_name: "",
+      doc_raw: ""
     };
   },
   computed: {
     ...mapState("user", ["profile"]),
     ...mapState("auth", ["token"]),
     pageTitle() {
-      return !this.readOnly ? "Создание задания" : this.taskData.name;
+      return (
+        "Лабораторная работа №" +
+        " " +
+        this.taskData.number +
+        ' "' +
+        this.taskData.name +
+        '"'
+      );
     },
-    colorData() {
-      if (this.taskData.completed) {
-        return "green";
-      } else {
-        return "red";
-      }
-    },
-
     taskType() {
       switch (this.type) {
         case "labs":
@@ -242,25 +282,35 @@ export default {
       }
       return "";
     },
-    today() {
-      const date = new Date();
-      const months = [
-        "января",
-        "февраля",
-        "марта",
-        "апреля",
-        "мая",
-        "июня",
-        "июля",
-        "августа",
-        "сентября",
-        "октября",
-        "ноября",
-        "декабря"
-      ];
-      return `${date.getDate()} ${
-        months[date.getMonth()]
-      } ${date.getFullYear()} г.`;
+    getActive() {
+      return this.$route.name;
+    },
+    isAdmin() {
+      return !!store.getters["user/isAdmin"];
+    },
+    isNewsEditor() {
+      return !!store.getters["user/isNewsEditor"];
+    },
+    isTeacher() {
+      return !!store.getters["user/isTeacher"];
+    },
+    variant() {
+      var i;
+      for (i = 0; i < this.taskData.users.length; i++) {
+        if (this.taskData.users[i].login == store.getters["user/login"]) {
+          return this.taskData.users[i].variant.number;
+        }
+      }
+      return "-";
+    },
+    variant_id() {
+      var i;
+      for (i = 0; i < this.taskData.users.length; i++) {
+        if (this.taskData.users[i].login == store.getters["user/login"]) {
+          return this.taskData.users[i].variant.id;
+        }
+      }
+      return "-";
     }
   },
   methods: {
@@ -274,11 +324,10 @@ export default {
       "GET_DISCIPLINES",
       "DELETE_USER"
     ]),
-    ...mapActions("user", ["FIND_USERS"]),
+    ...mapActions("user", ["FIND_USERS", "GET_GROUPS_MY"]),
     ...mapActions("chat", ["CREATE_CHAT"]),
 
     uploadFile() {
-      // чтобы отправить файлы
       this.$refs.upload.submit();
     },
     handleFileUpload() {
@@ -300,62 +349,14 @@ export default {
         });
       }
     },
-    handleSelect(item) {
-      if (!this.newTaskData.users) {
-        this.newTaskData.users = [];
-      }
-      this.newTaskData.users.push({
-        id: item.id,
-        fio: item.fio,
-        phone: item.phone,
-        faculty: item.faculty,
-        group: item.group,
-        email: item.email,
-        user_id: item.id
-      });
-      this.autocompleteValue = "";
+    handleSelect() {},
+    deleteUser(row) {
+      this.taskData.users = this.taskData.users.filter(
+        elem => elem.id != row.id
+      );
     },
-    async deleteUser() {
-      if (!this.readOnly) {
-        this.newTaskData.users = this.newTaskData.users.filter(
-          elem => elem.id != this.to_delete.id
-        );
-      } else {
-        try {
-          await this.DELETE_USER({
-            id: this.taskData.id,
-            user_id: this.to_delete.id
-          });
-          this.taskData.users = this.taskData.users.filter(
-            elem => elem.id != this.to_delete.id
-          );
-        } catch (err) {
-          this.$notify.error({
-            title: "Ошибка!",
-            message: "Что-то пошло не так"
-          });
-        }
-      }
-      this.isShowDeletePopup = false;
-    },
-    handleDropDownSelect(command) {
-      this.newTaskData.discipline = command;
-    },
-    async createTask() {
-      try {
-        this.newTaskData.thesisDate = this.newThesisDate;
-        await Promise.all([
-          this.CREATE_TASK({ taskData: this.newTaskData, taskType: this.type })
-        ]);
-        this.readOnly = true;
-        this.taskData = this.newTaskData;
-      } catch (err) {
-        this.$notify.error({
-          title: "Ошибка!",
-          message: "Что-то пошло не так"
-        });
-      }
-    },
+    handleDropDownSelect() {},
+    async createTask() {},
     addAttachment(file) {
       try {
         this.UPLOAD({ file: file, id: this.taskData.id });
@@ -371,44 +372,20 @@ export default {
         });
       }
     },
-    async handleDatePicker() {
-      if (this.readOnly) {
-        try {
-          console.log(this.taskData.id);
-          var c = this.taskData;
-          c.thesisDate = this.newThesisDate;
-          const resp = await this.CHANGE_TASK({
-            taskData: c,
-            id: this.taskData.id,
-            taskType: this.type
-          });
-          this.taskData.thesisDate = resp.thesis_date;
-          this.newThesisDate = "";
-          console.log(this.taskData.id);
-        } catch (e) {
-          this.$notify.error({
-            title: "Ошибка!",
-            message: "Что-то пошло не так"
-          });
-        }
-      }
-    },
     submitFile() {
-      console.log(this.UPLOAD(this.file));
+      this.UPLOAD(this.file);
     },
-    forceFileDownload(response) {
-      const url = window.URL.createObjectURL(
-        new Blob([response], { type: response.headers["content-type"] })
-      );
+    forceFileDownload(response, filename) {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.download = "Your_file_name";
+      link.download = filename;
       link.click();
     },
-    async downloadReport() {
+    async downloadReport(row) {
       try {
-        const resp = await this.DOWNLOAD_REPORT({ id: this.taskData.id });
-        this.forceFileDownload(resp);
+        const resp = await this.DOWNLOAD_REPORT({lab_id: this.taskData.id, user_id: row.id});
+        this.forceFileDownload(resp, resp.filename);
       } catch (e) {
         this.$notify.error({
           title: "Ошибка!",
@@ -424,15 +401,138 @@ export default {
         return "common-row";
       }
     },
-    async create_chat() {
+    async create_chat() {},
+    async findUsers(value, callback) {
       try {
-        await this.CREATE_CHAT({
-          name: this.taskData.name,
-          users: this.taskData.users
+        const result = await Promise.resolve(
+          this.FIND_USERS({
+            fio: value,
+            role_filter: "student"
+          })
+        );
+
+        callback(
+          result.filter(elem => {
+            var i;
+            for (i = 0; i < this.taskData.users.length; i++) {
+              if (elem.id === this.taskData.users[i].id) {
+                return false;
+              }
+            }
+            return true;
+          })
+        );
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
         });
-        this.createChat = true;
-        this.showChatCreation = false;
-        this.taskData.already_exists = true;
+      }
+    },
+    handleSearch(item) {
+      this.popupUser = item;
+    },
+    async submit() {
+      try {
+        await this.CHANGE_TASK({
+          taskData: this.taskData,
+          id: this.taskData.id
+        });
+        this.$notify({
+          title: "Успешно!",
+          message: "Изменения успешно применены"
+        });
+      } catch {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    },
+    async addUser() {
+      this.popupUser.variant = {};
+      this.taskData.users.push(JSON.parse(JSON.stringify(this.popupUser)));
+      this.popupUser = {};
+      this.popupGroup = {};
+      this.isShowCreatePopup = false;
+    },
+    selectGroup(value) {
+      var i;
+      for (i = 0; i < this.otherGroups.length; i++) {
+        if (this.otherGroups[i].name == value) {
+          this.popupGroup = JSON.parse(JSON.stringify(this.otherGroups[i]));
+          return;
+        }
+      }
+    },
+    selectVariant(value, row) {
+      var i, j;
+      for (i = 0; i < this.taskData.variants.length; i++) {
+        if (this.taskData.variants[i].number === value) {
+          j = i;
+        }
+      }
+      this.taskData.users.forEach(elem => {
+        if (elem.id != row.id) {
+          return;
+        }
+        elem.variant = JSON.parse(JSON.stringify(this.taskData.variants[j]));
+      });
+    },
+    async addGroup() {
+      try {
+        var g = JSON.parse(JSON.stringify(this.popupGroup));
+        g.users.forEach(elem => (elem.variant = {}));
+        this.taskData.users.push(...g.users);
+        this.popupUser = {};
+        this.popupGroup = {};
+        this.isShowAddGroupPopup = false;
+        const groups = await this.GET_GROUPS_MY({ filter: "student" });
+        this.otherGroups = groups;
+        this.otherGroups.forEach(elem => {
+          elem.users = elem.users.filter(e => {
+            var i;
+            for (i = 0; i < this.taskData.users.length; i++) {
+              if (e.id === this.taskData.users[i].id) {
+                return false;
+              }
+            }
+            return true;
+          });
+        });
+      } catch (err) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: err.message
+        });
+      }
+    },
+    handleSuccessFile(file) {
+      this.doc_name = file.name;
+      this.doc_raw = file.raw;
+    },
+    handleExceed() {
+      this.$message.error({
+        title: "Ошибка",
+        message: "Чтобы прикрепил файл, удалите первый."
+      });
+    },
+    handleRemove() {
+      this.image_bytes = undefined;
+    },
+    async upload() {
+      try {
+        await this.UPLOAD({
+          file: this.doc_raw,
+          data: {
+            doc_name: this.doc_name
+          },
+          variant_id: this.variant_id
+        });
+        this.$notify({
+          title: "Успешно!",
+          message: "Отчет успешно загружен"
+        })
       } catch (e) {
         this.$notify.error({
           title: "Ошибка!",
@@ -442,36 +542,57 @@ export default {
     }
   },
   async mounted() {
-    if (!this.$route.params.type) this.$router.push({ name: "home" });
-    this.readOnly = this.$route.params.readOnly;
-    this.type = this.$route.params.type;
-    this.taskData = Object.assign(this.taskData, this.$route.params.taskData);
-    if (this.readOnly) {
+    try {
+      const result = await this.GET_TASK({
+        id: this.$route.params.id
+      });
+      this.taskData = result;
+      var s = new Set();
+      this.taskData.variants.forEach(v => {
+        v.params.forEach(p => {
+          s.add(p.title);
+        });
+      });
+      this.taskData.params = [...s];
+      const groups = await this.GET_GROUPS_MY({ filter: "student" });
+      this.otherGroups = groups;
+      this.otherGroups.forEach(elem => {
+        elem.users = elem.users.filter(e => {
+          var i;
+          for (i = 0; i < this.taskData.users.length; i++) {
+            if (e.id === this.taskData.users[i].id) {
+              return false;
+            }
+          }
+          return true;
+        });
+      });
       try {
-        const result = await this.GET_TASK({
-          taskType: this.type,
-          id: this.taskData.id
+        this.taskData.variants.forEach(elem => {
+          this.taskData.params.forEach(pr => {
+            var i;
+            for (i = 0; i < elem.params.length; i++) {
+              if (elem.params[i].title == pr) {
+                elem[pr] = elem.params[i].value;
+                return;
+              }
+            }
+            elem[pr] = "-";
+          });
         });
-        this.taskData = result;
       } catch (e) {
-        this.$notify.error({
-          title: "Ошибка!",
-          message: "Что-то пошло не так"
-        });
+        console.log(e);
       }
-    }
-
-    if (!this.readOnly) {
-      this.newTaskData.issueDate = this.today; // кол-во мс, прошедших с 01.01.1970 г. по UTC
-      try {
-        const result = await this.GET_DISCIPLINES();
-        this.disciplines = result.disciplines;
-      } catch (e) {
-        this.$notify.error({
-          title: "Ошибка!",
-          message: "Что-то пошло не так"
-        });
+      if (!this.isTeacher) {
+        this.taskData.variants = this.taskData.variants.filter(
+          elem => elem.number === this.variant
+        );
       }
+    } catch (e) {
+      this.$notify.error({
+        title: "Ошибка!",
+        message: "Что-то пошло не так"
+      });
     }
   }
 };
@@ -482,43 +603,8 @@ export default {
   padding-top: 30px;
   width: 80%;
 }
-.mgt {
-  margin-top: 10px;
-}
-.el-dropdown-link {
-  cursor: pointer;
-  color: var(--background);
-}
-.el-icon-arrow-down {
-  font-size: 12px;
-}
-.task {
-  padding: 24px;
-  background: var(--white);
-  border-radius: var(--border-radius);
-  &__desc {
-    font-family: "Exo 2";
-    width: 75%;
-    min-height: 50px;
-    font-size: 16px;
-  }
-  &__info {
-    display: flex;
-    flex-direction: column;
-  }
-  &__input {
-    width: 100%;
-    max-width: 300px;
-  }
-}
-.autocomplete,
-.calendar {
-  width: 100%;
-  max-width: 400px;
-}
 .title {
-  right: 0;
-  width: 30%;
+  max-width: 80%;
 }
 .page-head {
   display: flex;
@@ -529,7 +615,6 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  width: 70%;
 }
 .task-type {
   width: fit-content;
@@ -539,35 +624,20 @@ export default {
   background: #9b9b9b;
   color: var(--white);
 }
-.task-completed {
-  width: fit-content;
-  padding: 8px 12px;
-  margin-right: 8px;
-  border-radius: 24px;
-  background: var(--primary);
-  color: var(--white);
-}
-.actions {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-}
-.flex {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
+.points {
   margin-top: 10px;
+  font-weight: 400;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 23pt;
 }
-.rigt-auto {
-  margin-right: auto;
-}
-
-.mr20 {
-  margin-right: 20px;
+.user_row {
+  display: flex;
+  font-weight: 700;
+  margin-top: 7px;
+  font-size: 20pt;
 }
 .down {
-  color: black;
-  background-color: var(--primary);
+  height: 35px;
 }
 </style>
 

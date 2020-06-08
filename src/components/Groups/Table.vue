@@ -25,7 +25,6 @@
         <el-dialog title="Создание группы" :visible.sync="isShowCreatePopup">
           <p class="hint-text mb-8">Название группы</p>
           <el-input placeholder="Название" v-model="creating.name" />
-          <el-switch v-model="creating.is_study" active-text="Учебная" style="margin-top:30px;"></el-switch>
           <div slot="footer" class="btn-footer">
             <Button
               type="simple"
@@ -53,7 +52,6 @@
           <template slot-scope="scope">
             <i
               @click="isShowDeletePopup = true; delete_row = scope.row"
-              v-if="!scope.row.is_study || scope.row.users.length == 0"
               class="el-icon-delete"
             />
           </template>
@@ -78,16 +76,6 @@
                 <Button type="primary" label="Да, удалить" width="150" @click="deleteGroup" />
               </div>
             </el-dialog>
-          </template>
-        </el-table-column>
-        <el-table-column width="50px">
-          <template slot-scope="scope">
-            <i
-            title="Перевести учебную группу"
-              v-if="scope.row.is_study"
-              @click="transferGroup(scope.row)"
-              class="el-icon-truck"
-            />
           </template>
         </el-table-column>
       </el-table>
@@ -151,15 +139,7 @@ export default {
     },
     updateGroup(row) {
       this.$router.push({
-        name: "change-group",
-        params: {
-          id: row.id
-        }
-      });
-    },
-    transferGroup(row) {
-      this.$router.push({
-        name: "group-transfer",
+        name: "change-group-my",
         params: {
           id: row.id
         }

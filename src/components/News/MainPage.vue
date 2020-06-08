@@ -1,44 +1,45 @@
 <template>
   <div class="news_page">
     <div class="news_page__body">
-      <el-select
-        placeholder="Выберите категорию"
-        class="news_page__input"
-        v-model="category_filter"
-        @change="filterByCategory"
-        allow-create
-      >
-        <el-option label="Все категории" value="all"></el-option>
-        <el-option-group label="Категории">
-          <el-option
-            v-for="category in categories"
-            :key="category"
-            :label="category"
-            :value="category"
-          ></el-option>
-        </el-option-group>
-      </el-select>
-      <div class="news_page__card" v-for="elem in news" :key="elem.id">
-        <div class="news_page__card__header">
+        <el-select
+          placeholder="Выберите категорию"
+          class="news_page__input"
+          v-model="category_filter"
+          @change="filterByCategory"
+          allow-create
+        >
+          <el-option label="Все категории" value="all"></el-option>
+          <el-option-group label="Категории">
+            <el-option
+              v-for="category in categories"
+              :key="category"
+              :label="category"
+              :value="category"
+            ></el-option>
+          </el-option-group>
+        </el-select>
+        <div class="news_page__card" v-for="elem in news" :key="elem.id">
+          <div class="news_page__card__header">
+            <p
+              style="margin-right: auto; font-size:20px; font-family: Arial, Helvetica, sans-serif;"
+            >{{ elem.title }}</p>
+          </div>
+          <div class="news_page__card__internal">
+            <div class="news_page__card__internal__body">{{ elem.body }}</div>
+            <div class="news_page__card__internal__image">
+              <img v-if="elem.image_bytes" style="width:100%;" :src="elem.image_bytes" />
+            </div>
+            <div v-if="elem.doc_name" class="news_page__card__internal__doc" @click="downloadFile(elem)">
+              <i class="el-icon-document"></i>
+              <p style="margin-left:7px;" class="doc-name">{{ elem.doc_name }}</p>
+            </div>
+          </div>
+          <div class="news_page__card__footer">
           <p
-            style="margin-right: auto; font-size:20px; font-family: Arial, Helvetica, sans-serif;"
-          >{{ elem.title }}</p>
+            style="margin-left: auto; font-size:14px; font-family: Arial, Helvetica, sans-serif;"
+          >{{ elem.created_at }}</p>
         </div>
-        <div class="news_page__card__internal">
-          <div class="news_page__card__internal__body">{{ elem.body }}</div>
-          <div class="news_page__card__internal__image">
-            <img
-              v-if="elem.image_bytes"
-              style="width:100%;"
-              :src="elem.image_bytes"
-            />
-          </div>
-          <div v-if="elem.doc_id" class="news_page__card__internal__doc">
-            <i class="el-icon-document"></i>
-            <p style="margin-left:7px;" class="doc-name">{{ elem.doc_name }}</p>
-          </div>
         </div>
-      </div>
     </div>
   </div>
 </template>
@@ -61,7 +62,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions("news", ["GET_NEWS", "DELETE_NEWS"]),
+    ...mapActions("news", ["GET_NEWS", "DELETE_NEWS", "DOWNLOAD_REPORT"]),
     createNews() {
       this.$router.push({
         name: "news-create"
@@ -113,6 +114,24 @@ export default {
           elem => elem.category == this.category_filter
         );
       }
+    },
+    forceFileDownload(response, filename) {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+    },
+    async downloadFile(elem) {
+      try {
+        const resp = await this.DOWNLOAD_REPORT({name: elem.doc_name});
+        this.forceFileDownload(resp, elem.doc_name);
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
     }
   },
   async mounted() {
@@ -141,11 +160,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 80%;
 
   &__input {
-      margin-bottom: 20px;
-      align-self: flex-start;
+    margin-bottom: 20px;
   }
 
   &__header {
@@ -172,18 +189,24 @@ export default {
 
   &__body {
     margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 750px;
   }
 
   &__card {
-    width: 50%;
     border-radius: 5px;
     border: 1px solid #dbdbdb;
     margin-bottom: 20px;
 
     &__header {
+      height: 40px;
+      display: flex;
+      padding: 10px;
+      justify-content: flex-end;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    &__footer {
       height: 40px;
       display: flex;
       padding: 10px;

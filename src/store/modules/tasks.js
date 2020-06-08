@@ -26,156 +26,84 @@ const actions = {
                     return []
                 }
                 return data.labs.map(function (elem) {
-                    if (elem.users[0]) {
-                        return {
-                            id: elem.id,
-                            completed: elem.completed,
-                            description: elem.description,
-                            discipline: elem.discipline,
-                            issueDate: elem.created_at,
-                            thesisDate: elem.thesis_date,
-                            name: elem.name,
-                            users: data.users,
-                            already_exists: data.already_exists,
-                        }
-                    } else {
-                        return {
-                            id: elem.id,
-                            completed: elem.completed,
-                            description: elem.description,
-                            discipline: elem.discipline,
-                            issueDate: elem.created_at,
-                            thesisDate: elem.thesis_date,
-                            name: elem.name,
-                            already_exists: data.already_exists,
-                        }
+                    return {
+                        id: elem.id,
+                        name: elem.name,
+                        discipline: elem.discipline,
+                        number: elem.number,
+                        points: elem.points,
+                        variants: elem.variants,
+                        users: elem.users,
                     }
+
                 })
             })
             .catch(err => {
                 errHandler(err)
             })
     },
-    CHANGE_TASK(_, { taskData, id, taskType}) {
-        let url = ''
-        switch (taskType) {
-            case 'labs':
-                url = `/api/labs/${id}`
-                break
-            case 'courses':
-                url = `/api/labs/${id}`
-                break
-        }
-        return apiClient.patch(url, {
-            thesisDate: taskData.thesisDate,
-        })
+    CHANGE_TASK(_, { taskData, id }) {
+        return apiClient.patch(`/api/labs/${id}`, taskData)
             .then(({ data }) => {
                 return data
             })
     },
-    GET_TASK(_, { taskType, id }) {
-        let url = ''
-        switch (taskType) {
-            case 'labs':
-                url = `/api/labs/${id}`
-                break
-            case 'courses':
-                url = `/api/labs/${id}`
-                break
-        }
-        return apiClient.get(url)
+    GET_TASK(_, { id }) {
+        return apiClient.get(`/api/labs/${id}`)
             .then(({ data }) => {
-                if (data.users.length > 0) {
-                    return {
-                        id: data.id,
-                        completed: data.completed,
-                        description: data.description,
-                        discipline: data.discipline,
-                        issueDate: data.created_at,
-                        thesisDate: data.thesis_date,
-                        name: data.name,
-                        users: data.users,
-                        already_exists: data.already_exists,
-                    }
-                } else {
-                    return {
-                        id: data.id,
-                        completed: data.completed,
-                        description: data.description,
-                        discipline: data.discipline,
-                        issueDate: data.created_at,
-                        thesisDate: data.thesis_date,
-                        name: data.name,
-                        already_exists: data.already_exists,
-                    }
+                return {
+                    id: data.id,
+                    name: data.name,
+                    discipline: data.discipline,
+                    number: data.number,
+                    points: data.points,
+                    variants: data.variants,
+                    users: data.users,
                 }
             })
             .catch(err => {
                 errHandler(err)
             })
     },
-    DELETE_TASK(_, { taskType,id }) {
-        let url = ''
-        switch (taskType) {
-            case 'labs':
-                url = '/api/labs/' + encodeURIComponent(id)
-                break
-            case 'courses':
-                url = '/api/labs/' + encodeURIComponent(id)
-                break
-        }
-        console.log(url)
-        return apiClient.delete(url)
+    DELETE_TASK(_, { id }) {
+        return apiClient.delete(`/api/labs/${id}`)
             .then(({ data }) => {
                 return data
             })
     },
-    CREATE_TASK(_, { taskData, taskType }) {
-        let url = ''
-        switch (taskType) {
-            case 'labs':
-                url = '/api/labs'
-                break
-            case 'courses':
-                url = '/api/labs'
-                break
-        }
-        delete taskData.id
-        return apiClient.post(url, {
-            completed: taskData.completed,
-            description: taskData.description,
-            discipline: taskData.discipline,
-            issueDate: taskData.issueDate,
-            thesisDate: taskData.thesisDate,
-            name: taskData.title,
-            users: taskData.users,
+    CREATE_TASK(_, { discipline, raw }) {
+        return apiClient.post('/api/labs', {
+            discipline: discipline,
+            raw: raw,
+        }).then(({ data }) => {
+            return data
         })
-            .then(({ data }) => {
-                return data
-            })
     },
     EXCEL() {
         let url = '/api/labs/report'
-        return apiClient.get(url, {responseType: 'blob'})
+        return apiClient.get(url, { responseType: 'blob' })
             .then(({ data }) => {
                 return data
             })
     },
-    UPLOAD(_, {file, id}) {
+    UPLOAD(_, { file, data, variant_id }) {
         var formData = new FormData();
-        formData.append('file', file.file)
-        let url = `/api/labs/${id}/report`
-        return apiClient.put(url, formData, { headers: { 'Content-Type': 'multipart/form-data'}})
+        formData.append('file', file)
+        formData.append('data', JSON.stringify(data))
+        let url = `/api/labs/${variant_id}/report`
+        return apiClient.put(url, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
             .then(({ data }) => {
                 return data
             })
     },
-    DOWNLOAD_REPORT(_, { id }) {
+    DOWNLOAD_REPORT(_, { lab_id, user_id }) {
         //window.open(`http://localhost:8888/api/labs/${id}/report`, '_blank');
-        let url = `/api/labs/${id}/report`
+        let url = `/api/labs/${lab_id}/${user_id}/report`
         return apiClient.get(url)
-            .then(({ data }) => {
-                return data
+            .then(res => {
+                return {
+                    data: res.data, filename: res.headers['content-disposition'].split("filename=")[1].substr(1).slice(0, -1)
+                }
             })
     },
     GET_DISCIPLINES() {
@@ -191,6 +119,12 @@ const actions = {
                 return data
             })
     },
+    GET_RAW(_, { discipline }) {
+        return apiClient.get(`/api/labs/${discipline}/raw`)
+            .then(({ data }) => {
+                return data.raw
+            })
+    }
 };
 
 const mutations = {

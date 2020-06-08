@@ -39,7 +39,7 @@
         </el-menu-item>
       </el-submenu>
       <el-menu-item
-        v-if="!isNewsEditor"
+        v-if="isNewsEditor"
         index="news"
         :route="{ name: 'news'}"
         >
@@ -64,11 +64,20 @@ export default {
     },
     isNewsEditor() {
       return !!store.getters["user/isNewsEditor"]
-    }
+    },
+    isTeacher() {
+      return !!store.getters["user/isTeacher"];
+    },
+
   },
   data() {
     return {
-      menuItems: [{ label: "Работы", linkTo: "labs", disabled: false, icon:"el-icon-menu" }, {label: "Чаты", linkTo: "chats", disabled: false, icon:"el-icon-s-promotion"}],
+      menuItems: [
+        { label: "Работы", linkTo: "labs", disabled: false, icon:"el-icon-menu", if: true },
+        {label: "Чаты", linkTo: "chats", disabled: false, icon:"el-icon-s-promotion", if: true},
+        {label: "Настройка групп", linkTo: "group-settings-my", disabled: false, icon:"el-icon-s-custom", if: true },
+        {label: "Управление лабораторными", linkTo: "task-management", disabled: false, icon:"el-icon-tickets", if: this.isTeacher},
+      ],
       adminMenuItems: [
         { label: "Настройка пользователей", linkTo: "user-settings", disabled: false },
         { label: "Настройка групп", linkTo: "group-settings", disabled: false },

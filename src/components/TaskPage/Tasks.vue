@@ -25,8 +25,6 @@
             return {
                 activeTab: 'labs',
                 tableDataLabs: [
-                ],
-                tableDataCourses: [
                 ]
             }
         },
@@ -35,19 +33,11 @@
             onTabClickandler() {
 
             },
-            async deleteTask(id, deletedElemID, type) {
+            async deleteTask(id) {
                 try {
-                    await this.DELETE_TASK({id:id,taskType:type})
-                    switch (type) {
-                    case 'labs':
-                        this.tableDataLabs = this.tableDataLabs.filter(elem => elem.id !== id)
-                        break
-                    case 'courses':
-                       this.tableDataCourses = this.tableDataCourses.filter(elem => elem.id !== id)
-                       break
-                    }
+                    await this.DELETE_TASK({id:id})
+                    this.tableDataLabs = this.tableDataLabs.filter(elem => elem.id !== id)
                 } catch (e) {
-                    console.log(e)
                     this.$notify.error({
                         title: 'Ошибка!',
                         message: 'Что-то пошло не так'
@@ -58,12 +48,10 @@
         async mounted() {
             // запрашиваем лабы и курсовые, формируем таблицы на странице
             try {
-                const [ labs, courses ] = await Promise.all([
-                    this.GET_TASKS({ taskType: 'labs' }),
+                const [ labs ] = await Promise.all([
                     this.GET_TASKS({ taskType: 'labs' })
                 ])
                 this.tableDataLabs = labs
-                this.tableDataCourses = courses
             } catch (err) {
                 this.$notify.error({
                     title: 'Ошибка!',

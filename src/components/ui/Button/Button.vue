@@ -80,6 +80,11 @@
                 transition: var(--hover-transition);
             }
         }
+        &_custom {
+            background: var(--cucumber);
+            border-color: var(--cucumber);
+            color: var(--white);
+        }
         &_reject {
             transition: var(--hover-transition);
             border-color: var(--grey);

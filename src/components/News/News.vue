@@ -80,6 +80,11 @@
             <p style="margin-left:7px;" class="doc-name">{{ elem.doc_name }}</p>
           </div>
         </div>
+        <div class="news_page__card__footer">
+          <p
+            style="margin-left: auto; font-size:14px; font-family: Arial, Helvetica, sans-serif;"
+          >{{ elem.created_at }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -242,6 +247,15 @@ export default {
     margin-bottom: 20px;
 
     &__header {
+      height: 40px;
+      display: flex;
+      padding: 10px;
+      justify-content: flex-end;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    &__footer {
       height: 40px;
       display: flex;
       padding: 10px;

@@ -21,8 +21,10 @@ const state = {
 const getters = {
     i: state => !state.profile.name || !state.login,
     name: state => state.profile.name,
+    login: state => state.profile.login,
     isAdmin: state => state.profile.role.admin,
     isNewsEditor: state => state.profile.role.news,
+    isTeacher: state => state.profile.role.teacher,
 };
 
 const isTeacher = function (element) {
@@ -83,7 +85,19 @@ const actions = {
         })
     },
     GET_GROUPS() {
-        return apiClient.get('/api/groups').then(({ data }) => {
+        return apiClient.get('/api/groups/admin').then(({ data }) => {
+            return data.groups
+        }).catch(err => {
+            return errHandler(err)
+        })
+    },
+    GET_GROUPS_MY(_, {filter}) {
+        console.log(filter)
+        const params = new URLSearchParams();
+        params.append('filter', filter);
+        return apiClient.get('/api/groups', {
+            params: params
+        }).then(({ data }) => {
             return data.groups
         }).catch(err => {
             return errHandler(err)
@@ -96,8 +110,8 @@ const actions = {
             return errHandler(err)
         })
     },
-    CREATE_USER(_, user ) {
-        return apiClient.post('/api/users', user ).then(({ data }) => {
+    CREATE_USER(_, user) {
+        return apiClient.post('/api/users', user).then(({ data }) => {
             return data
         }).catch(err => {
             return errHandler(err)
@@ -131,7 +145,7 @@ const actions = {
             return errHandler(err)
         })
     },
-    UPDATE_GROUP(_, {id, data}) {
+    UPDATE_GROUP(_, { id, data }) {
         console.log("KEK")
         return apiClient.patch(`/api/groups/${id}`, data).then(({ data }) => {
             return data

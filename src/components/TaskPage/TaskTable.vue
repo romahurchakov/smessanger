@@ -13,19 +13,18 @@
                             <div v-else>Поиск не дал результатов</div>
                         </template>
                 </el-autocomplete>
-                <Button type="primary" :label="createBtnLabel" width="300" @click="createTask"  v-if="profile.role.teacher"/>
             </div>
-            <el-table :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"  @row-click="onTableClickHandler" empty-text="Нет данных">
-                <el-table-column prop="name" label="Название"/>
-                <el-table-column prop="discipline" label="Дисциплина"/>
-                <el-table-column prop="thesisDate" label="Дедлайн"/>
+            <el-table :data="tableData.filter(data=> !autocompleteValue || !data.name || data.name.toLowerCase().includes(autocompleteValue.toLowerCase()))"  @row-click="onTableClickHandler" empty-text="Нет данных"
+                :default-sort = "{prop: 'discipline', order: 'ascending'}">
+                <el-table-column prop="discipline" label="Дисциплина" sortable/>
+                <el-table-column prop="number" label="Номер" sortable/>
+                 <el-table-column prop="name" label="Название" sortable/>
                 <el-table-column v-if="profile.role.teacher" width="150px">
                     <template slot-scope="scope">
-                        <Button @click="isShowPopup = true; id = scope.$index" label="Удалить"/>
+                        <Button @click="isShowPopup = true; to_delete = scope.row" label="Удалить" style="height:30px; width:100px;"/>
                     </template>
                 </el-table-column>
             </el-table>
-            <Button type="primary" label='Excel' width="170" class="excel" @click="downloadExcel" v-if="profile.role.teacher"/>
         </div>
         <el-dialog title="Хотите удалить задание" :visible.sync="isShowPopup" width="550px">
             <p>
@@ -77,27 +76,15 @@
         methods: {
             ...mapActions('tasks', ['EXCEL']),
             approveDeleteTask() {
-                this.deleteTask(this.tableData[this.id].id, this.id, this.type)
+                this.deleteTask(this.to_delete.id)
                 this.isShowPopup = false
-            },
-            createTask() {
-                this.$router.push({
-                    name: 'create-task',
-                    params: {
-                        readOnly: false,
-                        taskData: {},
-                        type: this.type
-                    }
-                })
             },
             onTableClickHandler(taskData, column) {
                 if (!column.label) return
                 this.$router.push({
                     name: 'create-task',
                     params: {
-                        readOnly: true,
-                        taskData: taskData,
-                        type: this.type
+                       id: taskData.id,
                     }
                 })
             },

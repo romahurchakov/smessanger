@@ -100,7 +100,7 @@ export default {
       category: "",
       category_1: "",
       doc_name: undefined,
-      doc_raw: undefined
+      doc_raw: undefined,
     };
   },
   methods: {
@@ -171,7 +171,6 @@ export default {
       }
     },
     handleSuccessFile(file) {
-      console.log(file);
       this.doc_name = file.name;
       this.doc_raw = file.raw;
     },

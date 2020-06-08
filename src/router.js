@@ -45,13 +45,22 @@ const router = new Router({
             component: () => import(/* webpackChunkName: "task" */ './components/TaskPage/Tasks')
         },
         {
-            path: '/task',
+            path: '/labs/:id',
             name: 'create-task',
             meta: {
                 title: 'Логин - Курсовая',
                 requiresAuth: true,
             },
             component: () => import(/* webpackChunkName: "task" */ './components/TaskPage/TaskPage')
+        },
+        {
+            path: '/labs/management',
+            name: 'task-management',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/TaskPage/Labs')
         },
         {
             path: '/admin/users',
@@ -151,6 +160,24 @@ const router = new Router({
                 requiresAuth: true,
             },
             component: () => import(/* webpackChunkName: "task" */ './components/Admin/Groups/Transfer')
+        },
+        {
+            path: '/groups',
+            name: 'group-settings-my',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Groups/Groups')
+        },
+        {
+            path: '/groups/:id',
+            name: 'change-group-my',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Groups/ChangeGroup')
         },
     ]
 });
