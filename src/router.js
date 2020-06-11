@@ -117,6 +117,15 @@ const router = new Router({
             component: () => import(/* webpackChunkName: "task" */ './components/Chats/Chats')
         },
         {
+            path: '/chats/:id',
+            name: 'one-chat',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Chats/OneChat')
+        },
+        {
             path: '/chats/creating',
             name: 'chats-creating',
             meta: {

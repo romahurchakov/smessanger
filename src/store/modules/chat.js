@@ -38,6 +38,12 @@ const actions = {
                 return data
             })
     },
+    GET_CHAT_ID(_, {user_id, discipline_id}) {
+        return apiClient.get(`/api/chats/${discipline_id}/${user_id}/id`)
+            .then(({ data }) => {
+                return data.chat_id
+            })
+    },
 };
 
 export default {

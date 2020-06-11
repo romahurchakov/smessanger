@@ -34,6 +34,7 @@ const actions = {
                         points: elem.points,
                         variants: elem.variants,
                         users: elem.users,
+                        discipline_id: elem.discipline_id,
                     }
 
                 })
@@ -59,6 +60,7 @@ const actions = {
                     points: data.points,
                     variants: data.variants,
                     users: data.users,
+                    discipline_id: data.discipline_id,
                 }
             })
             .catch(err => {

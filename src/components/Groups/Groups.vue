@@ -26,7 +26,8 @@ export default {
     onTabClickandler() {},
     async updateTable() {
       try {
-        const users = await this.GET_GROUPS_MY({filter:""});
+        var users = await this.GET_GROUPS_MY({filter:""});
+        users = users.filter(elem => !elem.is_study)
         var i;
         for (i = 0; i < users.length; i++) {
           users[i].num = 0;
@@ -45,7 +46,8 @@ export default {
   },
   async mounted() {
     try {
-      const users = await this.GET_GROUPS_MY({filter:""});
+      var users = await this.GET_GROUPS_MY({filter:""});
+      users = users.filter(elem => !elem.is_study)
       var i;
       for (i = 0; i < users.length; i++) {
         users[i].num = 0;

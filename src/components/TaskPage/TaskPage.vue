@@ -84,7 +84,13 @@
           </template>
         </el-table-column>
         <el-table-column fixed="right" width="100px">
-          <i class="el-icon-chat-line-round" style="margin-left:50%; margin-top:10px;" />
+          <template slot-scope="scope">
+            <i
+              class="el-icon-chat-line-round"
+              style="margin-left:50%; margin-top:10px;"
+              @click="toChat(scope.row)"
+            />
+          </template>
         </el-table-column>
         <el-table-column fixed="right" width="150px">
           <template slot-scope="scope">
@@ -325,7 +331,7 @@ export default {
       "DELETE_USER"
     ]),
     ...mapActions("user", ["FIND_USERS", "GET_GROUPS_MY"]),
-    ...mapActions("chat", ["CREATE_CHAT"]),
+    ...mapActions("chat", ["CREATE_CHAT", "GET_CHAT_ID"]),
 
     uploadFile() {
       this.$refs.upload.submit();
@@ -372,6 +378,25 @@ export default {
         });
       }
     },
+    async toChat(row) {
+      try {
+        const id = await this.GET_CHAT_ID({
+          user_id: row.id,
+          discipline_id: this.taskData.discipline_id
+        });
+        this.$router.push({
+          name: "one-chat",
+          params: {
+            id: id
+          }
+        });
+      } catch (e) {
+        this.$notify.error({
+          title: "Ошибка!",
+          message: "Что-то пошло не так"
+        });
+      }
+    },
     submitFile() {
       this.UPLOAD(this.file);
     },
@@ -384,7 +409,10 @@ export default {
     },
     async downloadReport(row) {
       try {
-        const resp = await this.DOWNLOAD_REPORT({lab_id: this.taskData.id, user_id: row.id});
+        const resp = await this.DOWNLOAD_REPORT({
+          lab_id: this.taskData.id,
+          user_id: row.id
+        });
         this.forceFileDownload(resp, resp.filename);
       } catch (e) {
         this.$notify.error({
@@ -532,7 +560,7 @@ export default {
         this.$notify({
           title: "Успешно!",
           message: "Отчет успешно загружен"
-        })
+        });
       } catch (e) {
         this.$notify.error({
           title: "Ошибка!",
