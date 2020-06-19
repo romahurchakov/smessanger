@@ -39,7 +39,7 @@
         </el-menu-item>
       </el-submenu>
       <el-menu-item
-        v-if="isNewsEditor"
+        v-if="!isNewsEditor"
         index="news"
         :route="{ name: 'news'}"
         >
@@ -77,11 +77,11 @@ export default {
         {label: "Чаты", linkTo: "chats", disabled: false, icon:"el-icon-s-promotion", if: true},
         {label: "Настройка групп", linkTo: "group-settings-my", disabled: false, icon:"el-icon-s-custom", if: true },
         {label: "Управление лабораторными", linkTo: "task-management", disabled: false, icon:"el-icon-tickets", if: this.isTeacher},
+        {label: "Отчеты", linkTo: "reports", disabled: false, icon:"el-icon-folder-opened", if: this.isTeacher},
       ],
       adminMenuItems: [
         { label: "Настройка пользователей", linkTo: "user-settings", disabled: false },
         { label: "Настройка групп", linkTo: "group-settings", disabled: false },
-        { label: "Управление сайтом", linkTo: "management", disabled: true }
       ],
       name: ""
     };

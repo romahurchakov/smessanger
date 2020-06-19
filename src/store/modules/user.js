@@ -28,21 +28,21 @@ const getters = {
 };
 
 const isTeacher = function (element) {
-    if (element.name == 'teacher') {
+    if (element.name == 'Преподаватель') {
         return true
     }
     return false
 }
 
 const isStudent = function (element) {
-    if (element.name == 'student') {
+    if (element.name == 'Студент') {
         return true
     }
     return false
 }
 
 const isAdmin = function (element) {
-    if (element.name == 'admin') {
+    if (element.name == 'Администратор') {
         return true
     }
     return false

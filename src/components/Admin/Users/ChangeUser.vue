@@ -50,6 +50,13 @@
         active-text="Администратор"
         @change="changeAdmin"
       ></el-switch>
+      <el-switch
+        style="display: block; margin-top: 10px;"
+        v-model="checked_redactor"
+        active-color="#13ce66"
+        active-text="Редактор"
+        @change="changeAdmin"
+      ></el-switch>
       <Button type="primary" label="Подтвердить" @click="updateUser" class="button" />
     </div>
   </main>
@@ -69,7 +76,8 @@ export default {
       roles: [],
       checked: false,
       admin_id: "",
-      role: {}
+      role: {},
+      checked_redactor: false,
     };
   },
   methods: {
@@ -109,11 +117,11 @@ export default {
 
     var i;
     for (i = 0; i < this.roles.length; i++) {
-      if (this.roles[i].name == "admin") {
+      if (this.roles[i].name == "Администратор") {
         this.admin_id = this.roles[i].id;
       }
     }
-    this.roles = this.roles.filter(elem => elem.name != "admin")
+    this.roles = this.roles.filter(elem => elem.name != "Администратор")
 
     try {
       const result = await this.GET_USER(this.$route.params.id);
@@ -127,7 +135,7 @@ export default {
 
     this.checked = false;
     for (i = 0; i < this.user.roles.length; i++) {
-      if (this.user.roles[i].name == "admin") {
+      if (this.user.roles[i].name == "Администратор") {
         this.checked = true;
       } else {
         this.role = this.user.roles[i].id;
@@ -140,7 +148,7 @@ export default {
 
 <style scoped lang="scss">
 .page {
-  width: 40%;
+  width: 80%;
 }
 .wrapper {
   display: flex;

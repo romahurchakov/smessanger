@@ -6,6 +6,20 @@
           <h2>Чаты</h2>
           <i class="el-icon-circle-plus add-icon" @click="createChat"></i>
         </div>
+        <el-dialog title="Создание чата" :visible.sync="isShowCreatePopup">
+          <p class="hint-text mb-8">Название чата</p>
+          <el-input placeholder="Название" />
+          <div slot="footer" class="btn-footer">
+            <Button
+              type="simple"
+              label="Отменить"
+              width="150"
+              class="mr-24"
+              @click="isShowCreatePopup = false"
+            />
+            <Button type="simple" label="Создать" width="150" @click="createGroup" />
+          </div>
+        </el-dialog>
         <div class="chats__list__list">
           <div
             v-for="(chat, index) in chats"
@@ -66,7 +80,8 @@ export default {
       active: false,
       show: false,
       showCreating: false,
-      to_delete: {}
+      to_delete: {},
+      isShowCreatePopup: false,
     };
   },
   computed: {
@@ -100,16 +115,7 @@ export default {
       }
     },
     async createChat() {
-      try {
-        this.$router.push({
-          name: "chats-creating"
-        });
-      } catch (e) {
-        this.$notify.error({
-          title: "Ошибка!",
-          message: "Что-то пошло не так"
-        });
-      }
+      this.isShowCreatePopup = true;
     }
   },
   async mounted() {
@@ -130,6 +136,7 @@ export default {
   height: 100%;
   justify-self: center;
   max-width: 750px;
+  margin-right: 400px;
 }
 .chats {
   display: flex;
@@ -193,7 +200,7 @@ export default {
   }
 
   &__body {
-    width: 600px;
+    width: 800%;
     height: 100%;
     min-height: 500px;
     border-left: 1px solid grey;

@@ -188,6 +188,15 @@ const router = new Router({
             },
             component: () => import(/* webpackChunkName: "task" */ './components/Groups/ChangeGroup')
         },
+        {
+            path: '/reports',
+            name: 'reports',
+            meta: {
+                title: 'Логин - Курсовая',
+                requiresAuth: true,
+            },
+            component: () => import(/* webpackChunkName: "task" */ './components/Tree/Tree')
+        },
     ]
 });
 

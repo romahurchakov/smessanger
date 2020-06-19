@@ -252,7 +252,7 @@ export default {
 
 <style lang="scss" scoped>
 .page {
-  width: 50%;
+  width: 80%;
   padding-top: 40px;
 }
 .page-head {

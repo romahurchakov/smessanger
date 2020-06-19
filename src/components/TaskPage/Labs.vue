@@ -78,7 +78,7 @@ export default {
         const result = await Promise.resolve(
           this.FIND_USERS({
             fio: value,
-            role_filter: "student"
+            role_filter: "Студент"
           })
         );
         callback(result);

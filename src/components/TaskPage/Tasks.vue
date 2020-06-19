@@ -6,7 +6,7 @@
         </div>
         <article>
             <el-tabs v-model="activeTab" @tab-click="onTabClickandler">
-                <el-tab-pane label="Лабы" name="labs" class="tab-opener">
+                <el-tab-pane label="Лабораторные" name="labs" class="tab-opener">
                     <TaskTable :tableData="tableDataLabs" type="labs" :deleteTask="deleteTask"/>
                 </el-tab-pane>
             </el-tabs>

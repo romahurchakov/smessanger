@@ -57,7 +57,7 @@
           </div>
           <div slot="footer" class="btn-footer">
             <Button
-              type="reject"
+              type="simple"
               label="Отменить"
               width="150"
               class="mr-24"

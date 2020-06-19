@@ -260,11 +260,11 @@ export default {
     justify-content: space-between;
     margin-top: 20px;
     &__left {
-      width: 40%;
+      width: 45%;
     }
 
     &__right {
-      width: 40%;
+      width:45%;
     }
   }
 

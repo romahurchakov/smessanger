@@ -344,7 +344,7 @@ export default {
         const result = await Promise.resolve(
           this.FIND_USERS({
             fio: value,
-            role_filter: "student"
+            role_filter: "Студент"
           })
         );
         callback(result);
@@ -435,7 +435,7 @@ export default {
         const result = await Promise.resolve(
           this.FIND_USERS({
             fio: value,
-            role_filter: "student"
+            role_filter: "Студент"
           })
         );
 
@@ -515,7 +515,7 @@ export default {
         this.popupUser = {};
         this.popupGroup = {};
         this.isShowAddGroupPopup = false;
-        const groups = await this.GET_GROUPS_MY({ filter: "student" });
+        const groups = await this.GET_GROUPS_MY({ filter: "Студент" });
         this.otherGroups = groups;
         this.otherGroups.forEach(elem => {
           elem.users = elem.users.filter(e => {
@@ -582,7 +582,7 @@ export default {
         });
       });
       this.taskData.params = [...s];
-      const groups = await this.GET_GROUPS_MY({ filter: "student" });
+      const groups = await this.GET_GROUPS_MY({ filter: "Студент" });
       this.otherGroups = groups;
       this.otherGroups.forEach(elem => {
         elem.users = elem.users.filter(e => {

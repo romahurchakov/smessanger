@@ -22,6 +22,7 @@
     </div>
     <div class="chat__input">
       <el-input placeholder="Введите сообщение..." v-model="input" @keyup.enter.native="addMessage"></el-input>
+      <icon class="el-icon-paperclip" style="margin-left: 25px;"> </icon>
     </div>
   </div>
 </template>
@@ -149,6 +150,8 @@ export default {
   &__input {
     background-color: rgb(243, 243, 243);
     padding: 13px;
+    display: flex;
+    align-items: center;
   }
 }
 
