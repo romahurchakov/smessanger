@@ -29,7 +29,7 @@ export default {
   data() {
     return {
       menuItems: [
-        { label: "Профиль", linkTo: "home", disabled: false },
+        { label: "Главная", linkTo: "home", disabled: false },
         { label: "Новости", linkTo: "news-page", disabled: false },
         { label: "Абитуриенту", linkTo: "entrant", disabled: false },
         { label: "Наука", linkTo: "", disabled: false },

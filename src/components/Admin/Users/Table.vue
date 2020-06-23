@@ -73,7 +73,6 @@
       >
         <el-table-column prop="fio" label="ФИО" />
         <el-table-column prop="login" label="Логин" />
-        <el-table-column prop="faculty" label="Факультет" />
         <el-table-column prop="group" label="Группа" />
         <el-table-column prop="phone" label="Телефон" />
         <el-table-column prop="email" label="Почта" />

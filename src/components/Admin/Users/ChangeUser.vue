@@ -13,10 +13,6 @@
       </div>
       <div class="flex">
         <div class="mb-24">
-          <p class="hint-text mb-8">Факультет</p>
-          <el-input placeholder="Факультет" v-model="user.faculty" />
-        </div>
-        <div class="mb-24">
           <p class="hint-text mb-8">Группа</p>
           <el-input placeholder="Группа" v-model="user.group" />
         </div>

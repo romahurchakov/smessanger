@@ -95,7 +95,7 @@ export default {
 }
 
 .profile {
-  max-width: 70vh;
+  max-width: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;

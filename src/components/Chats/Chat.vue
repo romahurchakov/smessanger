@@ -8,7 +8,7 @@
       <i class="el-icon-s-tools delete-icon" @click="showsetting = true"></i>
     </div>
     <div class="chat__list" ref="messagesContainer">
-      <div v-for="message in chat.messages" :key="message.id">
+      <div v-for="(message,index) in chat.messages" :key="message.id">
         <div class="chat__list__message">
           <div class="chat__list__message__header">
             <p>{{ message.created_by_fio }}</p>
@@ -17,12 +17,18 @@
           <div class="chat__list__mesage__body">
             <p>{{ message.text }}</p>
           </div>
+          <div v-if="index == 1">
+              <div class="doc">
+                <i class="el-icon-document"></i>
+                <p style="margin-left:7px;" class="doc-name">hello_world.py</p>
+              </div>
+            </div>
         </div>
       </div>
     </div>
     <div class="chat__input">
       <el-input placeholder="Введите сообщение..." v-model="input" @keyup.enter.native="addMessage"></el-input>
-      <icon class="el-icon-paperclip" style="margin-left: 25px;"> </icon>
+      <icon class="el-icon-paperclip" style="margin-left: 25px;"></icon>
     </div>
   </div>
 </template>
@@ -153,6 +159,16 @@ export default {
     display: flex;
     align-items: center;
   }
+}
+
+.doc {
+  margin-top: 20px;
+  display: flex;
+}
+
+.doc:hover {
+  color: blue;
+  cursor: pointer;
 }
 
 .delete-icon {

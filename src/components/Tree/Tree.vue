@@ -19,7 +19,7 @@ export default {
     const data = [
       {
         id: 1,
-        label: "ООП",
+        label: "Алгоритмы компьютерной графики",
         children: [
           {
             id: 4,
